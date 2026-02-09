@@ -2,7 +2,7 @@ import Parser from "rss-parser";
 import { RawStory } from "../types";
 
 const parser = new Parser({
-  timeout: 10000,
+  timeout: 5000,
   headers: {
     "User-Agent": "LoveReport/1.0 (positive news aggregator)",
   },

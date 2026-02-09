@@ -43,7 +43,7 @@ export async function fetchFromNewsData(): Promise<RawStory[]> {
       });
 
       const res = await fetch(`${NEWSDATA_BASE}?${params}`, {
-        signal: AbortSignal.timeout(10000),
+        signal: AbortSignal.timeout(5000),
       });
 
       if (!res.ok) {
