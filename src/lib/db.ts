@@ -16,13 +16,22 @@ const JSON_PATH = path.join(DATA_DIR, "stories.json");
 
 async function readGist(): Promise<CuratedStory[]> {
   try {
-    // Use raw URL for fast reads (no auth needed for public gists)
+    // Use GitHub API directly to avoid CDN caching on gist raw URLs
     const res = await fetch(
-      `https://gist.githubusercontent.com/Fluxuous/${GIST_ID}/raw/${GIST_FILENAME}`,
-      { cache: "no-store" }
+      `https://api.github.com/gists/${GIST_ID}`,
+      {
+        headers: {
+          Accept: "application/vnd.github.v3+json",
+          ...(GITHUB_TOKEN ? { Authorization: `token ${GITHUB_TOKEN}` } : {}),
+        },
+        cache: "no-store",
+      }
     );
     if (!res.ok) return [];
-    return await res.json();
+    const gist = await res.json();
+    const content = gist.files?.[GIST_FILENAME]?.content;
+    if (!content) return [];
+    return JSON.parse(content);
   } catch (err) {
     console.error("[DB] Failed to read gist:", err);
     return [];
