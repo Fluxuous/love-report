@@ -22,14 +22,14 @@ REJECT stories that are:
 - Political partisan spin
 
 For each selected story, provide:
-- title: The original headline (keep as-is)
-- url: The original URL (keep as-is)
+- index: The story number from the list (e.g. 1, 5, 23)
 - importance: 1-10 (10 = most significant global impact)
 - category: one of: health | environment | science | justice | community | human-interest | innovation
-- summary: One sentence on why this matters to the world
+- summary: One SHORT sentence on why this matters (max 15 words)
 - is_headline: true for the SINGLE most important positive story (only one!)
 
-Return a JSON array. Select the top 20-30 best stories maximum.
+Return a JSON array of objects with keys: index, importance, category, summary, is_headline.
+Select the top 20-25 best stories maximum.
 Return ONLY valid JSON, no markdown fences or explanation.`;
 
 export async function curateWithClaude(
@@ -45,6 +45,7 @@ export async function curateWithClaude(
     .join("\n");
 
   try {
+    console.log(`[Claude] Sending ${stories.length} headlines (${headlines.length} chars) to Haiku...`);
     const message = await client.messages.create({
       model: "claude-haiku-4-5-20251001",
       max_tokens: 4096,
@@ -60,23 +61,52 @@ export async function curateWithClaude(
     const text =
       message.content[0].type === "text" ? message.content[0].text : "";
 
+    console.log(`[Claude] Response length: ${text.length} chars, stop_reason: ${message.stop_reason}`);
+
     // Parse JSON response, handling potential markdown fences
     const jsonStr = text
       .replace(/^```json?\s*/m, "")
       .replace(/```\s*$/m, "")
       .trim();
 
-    const results: ClaudeCurationResult[] = JSON.parse(jsonStr);
+    interface ClaudeIndexResult {
+      index: number;
+      importance: number;
+      category: string;
+      summary: string;
+      is_headline: boolean;
+    }
 
-    // Validate and ensure only one headline
+    let indexed: ClaudeIndexResult[];
+    try {
+      indexed = JSON.parse(jsonStr);
+    } catch (parseErr) {
+      console.error("[Claude] Failed to parse JSON response:", jsonStr.slice(0, 500));
+      throw parseErr;
+    }
+
+    // Map indices back to original stories
+    const results: ClaudeCurationResult[] = [];
     let headlineCount = 0;
-    for (const result of results) {
-      if (result.is_headline) {
+
+    for (const item of indexed) {
+      const storyIdx = item.index - 1; // 1-indexed to 0-indexed
+      if (storyIdx < 0 || storyIdx >= stories.length) continue;
+
+      const story = stories[storyIdx];
+      if (item.is_headline) {
         headlineCount++;
-        if (headlineCount > 1) {
-          result.is_headline = false;
-        }
+        if (headlineCount > 1) item.is_headline = false;
       }
+
+      results.push({
+        title: story.title,
+        url: story.url,
+        importance: item.importance,
+        category: item.category as ClaudeCurationResult["category"],
+        summary: item.summary,
+        is_headline: item.is_headline,
+      });
     }
 
     // If no headline was selected, pick the highest importance

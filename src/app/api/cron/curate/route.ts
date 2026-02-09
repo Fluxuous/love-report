@@ -30,7 +30,7 @@ export async function GET(request: NextRequest) {
     log.push(`Fetched ${rawStories.length} raw stories`);
 
     // Step 2: Keyword pre-filter
-    const candidates = keywordPreFilter(rawStories, 100);
+    const candidates = keywordPreFilter(rawStories, 50);
     log.push(`Keyword filter: ${candidates.length} candidates`);
 
     // Step 3: AI curation with Claude
