@@ -1,4 +1,4 @@
-declare module "sql.js" {
+declare module "sql.js/dist/sql-asm.js" {
   interface Database {
     run(sql: string, params?: unknown[]): void;
     exec(sql: string, params?: unknown[]): QueryExecResult[];

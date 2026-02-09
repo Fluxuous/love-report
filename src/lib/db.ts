@@ -1,10 +1,12 @@
-import initSqlJs, { Database } from "sql.js";
+// Use ASM.js version - no WASM file needed, works on Vercel serverless
+import initSqlJs, { Database } from "sql.js/dist/sql-asm.js";
 import { readFileSync, writeFileSync, existsSync, mkdirSync } from "fs";
 import path from "path";
 import { CuratedStory, ClaudeCurationResult } from "./types";
 import crypto from "crypto";
 
-const DB_DIR = path.join(process.cwd(), "data");
+const IS_VERCEL = !!process.env.VERCEL;
+const DB_DIR = IS_VERCEL ? "/tmp" : path.join(process.cwd(), "data");
 const DB_PATH = path.join(DB_DIR, "love-report.db");
 
 let db: Database | null = null;
@@ -58,9 +60,13 @@ async function getDb(): Promise<Database> {
 
 function saveDb(): void {
   if (!db) return;
-  const data = db.export();
-  const buffer = Buffer.from(data);
-  writeFileSync(DB_PATH, buffer);
+  try {
+    const data = db.export();
+    const buffer = Buffer.from(data);
+    writeFileSync(DB_PATH, buffer);
+  } catch (err) {
+    console.error("[DB] Failed to save database:", err);
+  }
 }
 
 export async function upsertStories(
@@ -92,7 +98,7 @@ export async function upsertStories(
         id,
         story.title,
         story.url,
-        "", // source gets lost in curation, that's ok for MVP
+        "",
         story.category,
         story.importance,
         story.summary,
@@ -156,9 +162,7 @@ export async function archiveOldStories(hoursOld: number = 48): Promise<number> 
 
   saveDb();
 
-  const result = database.exec(
-    "SELECT changes() as count"
-  );
+  const result = database.exec("SELECT changes() as count");
   return result.length ? (result[0].values[0][0] as number) : 0;
 }
 
