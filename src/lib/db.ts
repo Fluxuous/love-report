@@ -1,175 +1,170 @@
-// Use ASM.js version - no WASM file needed, works on Vercel serverless
-import initSqlJs, { Database } from "sql.js/dist/sql-asm.js";
-import { readFileSync, writeFileSync, existsSync, mkdirSync } from "fs";
-import path from "path";
 import { CuratedStory, ClaudeCurationResult } from "./types";
 import crypto from "crypto";
+import { readFileSync, writeFileSync, existsSync, mkdirSync } from "fs";
+import path from "path";
 
 const IS_VERCEL = !!process.env.VERCEL;
-const DB_DIR = IS_VERCEL ? "/tmp" : path.join(process.cwd(), "data");
-const DB_PATH = path.join(DB_DIR, "love-report.db");
+const GIST_ID = process.env.GIST_ID || "d520253be8b5d0a4260192b75217fec0";
+const GIST_FILENAME = "stories.json";
+const GITHUB_TOKEN = process.env.GITHUB_TOKEN;
 
-let db: Database | null = null;
+// Local dev storage
+const DATA_DIR = path.join(process.cwd(), "data");
+const JSON_PATH = path.join(DATA_DIR, "stories.json");
 
-async function getDb(): Promise<Database> {
-  if (db) return db;
+// --- GitHub Gist storage (production) ---
 
-  const SQL = await initSqlJs();
-
-  if (!existsSync(DB_DIR)) {
-    mkdirSync(DB_DIR, { recursive: true });
+async function readGist(): Promise<CuratedStory[]> {
+  try {
+    // Use raw URL for fast reads (no auth needed for public gists)
+    const res = await fetch(
+      `https://gist.githubusercontent.com/Fluxuous/${GIST_ID}/raw/${GIST_FILENAME}`,
+      { cache: "no-store" }
+    );
+    if (!res.ok) return [];
+    return await res.json();
+  } catch (err) {
+    console.error("[DB] Failed to read gist:", err);
+    return [];
   }
-
-  if (existsSync(DB_PATH)) {
-    const buffer = readFileSync(DB_PATH);
-    db = new SQL.Database(buffer);
-  } else {
-    db = new SQL.Database();
-  }
-
-  // Create tables if they don't exist
-  db.run(`
-    CREATE TABLE IF NOT EXISTS stories (
-      id TEXT PRIMARY KEY,
-      title TEXT NOT NULL,
-      url TEXT NOT NULL UNIQUE,
-      source TEXT,
-      category TEXT,
-      importance INTEGER,
-      summary TEXT,
-      image_url TEXT,
-      published_at TEXT,
-      curated_at TEXT,
-      is_headline INTEGER DEFAULT 0,
-      is_active INTEGER DEFAULT 1
-    )
-  `);
-
-  db.run(`
-    CREATE INDEX IF NOT EXISTS idx_stories_active
-    ON stories(is_active, importance DESC)
-  `);
-
-  db.run(`
-    CREATE INDEX IF NOT EXISTS idx_stories_date
-    ON stories(curated_at DESC)
-  `);
-
-  return db;
 }
 
-function saveDb(): void {
-  if (!db) return;
-  try {
-    const data = db.export();
-    const buffer = Buffer.from(data);
-    writeFileSync(DB_PATH, buffer);
-  } catch (err) {
-    console.error("[DB] Failed to save database:", err);
+async function writeGist(stories: CuratedStory[]): Promise<void> {
+  if (!GITHUB_TOKEN) {
+    console.error("[DB] No GITHUB_TOKEN set, cannot write to gist");
+    return;
   }
+  try {
+    const res = await fetch(`https://api.github.com/gists/${GIST_ID}`, {
+      method: "PATCH",
+      headers: {
+        Authorization: `token ${GITHUB_TOKEN}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        files: {
+          [GIST_FILENAME]: {
+            content: JSON.stringify(stories),
+          },
+        },
+      }),
+    });
+    if (!res.ok) {
+      console.error("[DB] Failed to write gist:", res.status, await res.text());
+    }
+  } catch (err) {
+    console.error("[DB] Failed to write gist:", err);
+  }
+}
+
+// --- Local JSON file storage (dev) ---
+
+function readLocal(): CuratedStory[] {
+  try {
+    if (!existsSync(JSON_PATH)) return [];
+    return JSON.parse(readFileSync(JSON_PATH, "utf-8"));
+  } catch {
+    return [];
+  }
+}
+
+function writeLocal(stories: CuratedStory[]): void {
+  if (!existsSync(DATA_DIR)) {
+    mkdirSync(DATA_DIR, { recursive: true });
+  }
+  writeFileSync(JSON_PATH, JSON.stringify(stories, null, 2));
+}
+
+// --- Unified read/write ---
+
+async function readAll(): Promise<CuratedStory[]> {
+  return IS_VERCEL ? readGist() : readLocal();
+}
+
+async function writeAll(stories: CuratedStory[]): Promise<void> {
+  if (IS_VERCEL) {
+    await writeGist(stories);
+  } else {
+    writeLocal(stories);
+  }
+}
+
+// --- Public API ---
+
+export async function getActiveStories(): Promise<CuratedStory[]> {
+  const stories = await readAll();
+  return stories
+    .filter((s) => s.is_active)
+    .sort((a, b) => {
+      if (a.is_headline && !b.is_headline) return -1;
+      if (!a.is_headline && b.is_headline) return 1;
+      return b.importance - a.importance;
+    })
+    .slice(0, 50);
 }
 
 export async function upsertStories(
-  stories: ClaudeCurationResult[]
+  newStories: ClaudeCurationResult[]
 ): Promise<number> {
-  const database = await getDb();
+  const existing = await readAll();
   const now = new Date().toISOString();
+
+  // Clear old headline flags
+  for (const s of existing) {
+    s.is_headline = false;
+  }
+
+  const byUrl = new Map(existing.map((s) => [s.url, s]));
   let inserted = 0;
 
-  // Clear current headline flag
-  database.run("UPDATE stories SET is_headline = 0 WHERE is_headline = 1");
-
-  const stmt = database.prepare(`
-    INSERT OR REPLACE INTO stories
-      (id, title, url, source, category, importance, summary, image_url, published_at, curated_at, is_headline, is_active)
-    VALUES
-      (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 1)
-  `);
-
-  for (const story of stories) {
+  for (const story of newStories) {
     const id = crypto
       .createHash("md5")
       .update(story.url)
       .digest("hex")
       .slice(0, 12);
 
-    try {
-      stmt.run([
-        id,
-        story.title,
-        story.url,
-        "",
-        story.category,
-        story.importance,
-        story.summary,
-        null,
-        now,
-        now,
-        story.is_headline ? 1 : 0,
-      ]);
-      inserted++;
-    } catch {
-      // Duplicate URL, skip
-    }
+    byUrl.set(story.url, {
+      id,
+      title: story.title,
+      url: story.url,
+      source: "",
+      category: story.category,
+      importance: story.importance,
+      summary: story.summary,
+      published_at: now,
+      curated_at: now,
+      is_headline: story.is_headline,
+      is_active: true,
+    });
+    inserted++;
   }
 
-  stmt.free();
-  saveDb();
+  await writeAll(Array.from(byUrl.values()));
   return inserted;
 }
 
-export async function getActiveStories(): Promise<CuratedStory[]> {
-  const database = await getDb();
+export async function archiveOldStories(hoursOld: number = 48): Promise<number> {
+  const stories = await readAll();
+  const cutoff = new Date(Date.now() - hoursOld * 60 * 60 * 1000).toISOString();
+  let archived = 0;
 
-  const results = database.exec(`
-    SELECT id, title, url, source, category, importance, summary,
-           image_url, published_at, curated_at, is_headline, is_active
-    FROM stories
-    WHERE is_active = 1
-    ORDER BY is_headline DESC, importance DESC
-    LIMIT 50
-  `);
-
-  if (!results.length || !results[0].values.length) {
-    return [];
+  for (const story of stories) {
+    if (story.is_active && story.curated_at < cutoff) {
+      story.is_active = false;
+      archived++;
+    }
   }
 
-  return results[0].values.map((row) => ({
-    id: row[0] as string,
-    title: row[1] as string,
-    url: row[2] as string,
-    source: row[3] as string,
-    category: row[4] as string as CuratedStory["category"],
-    importance: row[5] as number,
-    summary: row[6] as string,
-    image_url: (row[7] as string) || undefined,
-    published_at: row[8] as string,
-    curated_at: row[9] as string,
-    is_headline: (row[10] as number) === 1,
-    is_active: (row[11] as number) === 1,
-  }));
-}
+  // Remove very old stories (> 7 days) entirely
+  const weekAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString();
+  const filtered = stories.filter((s) => s.curated_at >= weekAgo);
 
-export async function archiveOldStories(hoursOld: number = 48): Promise<number> {
-  const database = await getDb();
-  const cutoff = new Date(
-    Date.now() - hoursOld * 60 * 60 * 1000
-  ).toISOString();
-
-  database.run("UPDATE stories SET is_active = 0 WHERE curated_at < ?", [
-    cutoff,
-  ]);
-
-  saveDb();
-
-  const result = database.exec("SELECT changes() as count");
-  return result.length ? (result[0].values[0][0] as number) : 0;
+  await writeAll(filtered);
+  return archived;
 }
 
 export async function getStoryCount(): Promise<number> {
-  const database = await getDb();
-  const result = database.exec(
-    "SELECT COUNT(*) FROM stories WHERE is_active = 1"
-  );
-  return result.length ? (result[0].values[0][0] as number) : 0;
+  const stories = await getActiveStories();
+  return stories.length;
 }
