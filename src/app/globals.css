@@ -1,44 +1,204 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
-
-@layer base {
-  body {
-    @apply bg-cream text-warm-brown;
-  }
-
-  a {
-    @apply text-warm-blue hover:text-gold transition-colors duration-150;
-  }
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
 }
 
-@layer components {
-  .story-link {
-    @apply block py-1 text-sm leading-snug;
-  }
-
-  .story-link:hover {
-    @apply text-gold;
-  }
-
-  .category-header {
-    @apply text-forest-green font-serif font-bold text-sm uppercase tracking-wider
-           border-b-2 border-forest-green pb-1 mb-3;
-  }
-
-  .headline-link {
-    @apply text-warm-brown hover:text-gold font-serif font-bold
-           text-2xl md:text-3xl lg:text-4xl leading-tight
-           uppercase tracking-tight text-center block;
-  }
-
-  .column-divider {
-    @apply border-l border-warm-brown/20;
-  }
+body {
+  font-family: "Times New Roman", Times, serif;
+  font-size: 14px;
+  line-height: 1.5;
+  background: #ffffff;
+  color: #000000;
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 0 10px;
 }
 
-/* Drudge-style dense link list */
-.story-bullet::before {
-  content: "\25BA ";
-  @apply text-coral text-xs;
+a {
+  color: #000000;
+  text-decoration: underline;
+}
+
+a:hover {
+  color: #0000cc;
+}
+
+img {
+  max-width: 100%;
+  height: auto;
+  display: block;
+}
+
+hr {
+  border: none;
+  border-top: 1px solid #000000;
+  margin: 8px 0;
+}
+
+/* ============ TOP SECTION (above the logo) ============ */
+.lr-top-section {
+  padding: 8px 0;
+}
+
+.lr-top-section img {
+  max-width: 320px;
+  margin-bottom: 6px;
+}
+
+.lr-top-section a {
+  display: block;
+  font-size: 14px;
+  line-height: 1.6;
+  font-weight: bold;
+}
+
+.lr-top-section a.red {
+  color: #ff0000;
+}
+
+/* ============ BANNER / LOGO AREA ============ */
+.lr-banner {
+  text-align: center;
+  padding: 20px 0 14px;
+}
+
+.lr-banner img {
+  max-width: 500px;
+  max-height: 350px;
+  margin: 0 auto 10px;
+}
+
+.lr-hearts {
+  font-size: 48px;
+  line-height: 1;
+  margin-bottom: 2px;
+  letter-spacing: 8px;
+  animation: pulse-hearts 2s ease-in-out infinite;
+}
+
+@keyframes pulse-hearts {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.15); }
+}
+
+.lr-banner-headline a {
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 38px;
+  font-weight: bold;
+  color: #000000;
+  text-decoration: none;
+  display: block;
+  line-height: 1.15;
+  margin-bottom: 0;
+}
+
+.lr-banner-headline a:hover {
+  text-decoration: underline;
+}
+
+.lr-logo {
+  font-family: Impact, "Arial Black", "Helvetica Neue", Arial, sans-serif;
+  font-size: 110px;
+  font-weight: 900;
+  letter-spacing: -2px;
+  color: #000000;
+  line-height: 0.95;
+  margin: 4px 0 0;
+  text-shadow: 3px 3px 0px #d0d0d0, 4px 4px 0px #b0b0b0;
+}
+
+/* ============ THREE COLUMNS ============ */
+.lr-columns {
+  display: flex;
+  gap: 0;
+  padding-top: 10px;
+  border-top: 1px solid #000000;
+}
+
+.lr-col {
+  flex: 1;
+  padding: 0 8px;
+  min-width: 0;
+}
+
+.lr-col:not(:last-child) {
+  border-right: 1px solid #000000;
+}
+
+.lr-col a {
+  display: block;
+  font-size: 14px;
+  line-height: 1.5;
+  padding: 3px 0;
+  font-weight: bold;
+}
+
+.lr-col a.red {
+  color: #ff0000;
+}
+
+.lr-col a.italic {
+  font-style: italic;
+}
+
+.lr-col img {
+  max-width: 200px;
+  margin: 6px 0;
+}
+
+.lr-col hr {
+  margin: 8px 0;
+}
+
+/* ============ FOOTER ============ */
+.lr-footer {
+  text-align: center;
+  padding: 12px 0;
+  font-size: 11px;
+  color: #999999;
+  border-top: 1px solid #000000;
+  margin-top: 10px;
+}
+
+/* ============ EMPTY STATE ============ */
+.lr-empty {
+  text-align: center;
+  padding: 40px 0;
+  color: #999999;
+}
+
+.lr-empty code {
+  background: #f0f0f0;
+  padding: 2px 6px;
+  font-family: "Courier New", Courier, monospace;
+  font-size: 12px;
+}
+
+/* ============ MOBILE ============ */
+@media (max-width: 640px) {
+  .lr-columns {
+    flex-direction: column;
+  }
+  .lr-col:not(:last-child) {
+    border-right: none;
+    border-bottom: 1px solid #000000;
+    padding-bottom: 8px;
+    margin-bottom: 8px;
+  }
+  .lr-banner-headline a {
+    font-size: 26px;
+  }
+  .lr-logo {
+    font-size: 60px;
+    letter-spacing: -1px;
+    text-shadow: 2px 2px 0px #d0d0d0;
+  }
+  .lr-hearts {
+    font-size: 32px;
+    letter-spacing: 4px;
+  }
+  .lr-top-section img {
+    max-width: 250px;
+  }
 }

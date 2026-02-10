@@ -1,53 +1,43 @@
 import { NextResponse } from "next/server";
 import { getActiveStories } from "@/lib/db";
-import { ColumnGroup, CuratedStory } from "@/lib/types";
+import { DrudgeLayout, CuratedStory } from "@/lib/types";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
 
-function groupStories(stories: CuratedStory[]): ColumnGroup {
-  const headline = stories.find((s) => s.is_headline) || stories[0] || null;
-  const rest = stories.filter((s) => s !== headline);
+function layoutStories(stories: CuratedStory[]): DrudgeLayout {
+  const banner = stories.find((s) => s.tier === "banner" || s.is_headline) || null;
+  const rest = stories.filter((s) => s !== banner);
 
-  const scienceHealth = rest.filter(
-    (s) => s.category === "science" || s.category === "health"
-  );
-  const communityHuman = rest.filter(
-    (s) => s.category === "community" || s.category === "human-interest"
-  );
-  const justiceEnvironment = rest.filter(
-    (s) => s.category === "justice" || s.category === "environment"
-  );
-  const innovation = rest.filter((s) => s.category === "innovation");
+  const sorted = [...rest].sort((a, b) => b.importance - a.importance);
+  const top = sorted.slice(0, 8);
+  const remaining = sorted.slice(8);
 
-  // Distribute uncategorized stories to shortest column
-  const categorized = new Set([
-    ...scienceHealth,
-    ...communityHuman,
-    ...justiceEnvironment,
-    ...innovation,
-  ]);
+  const left: CuratedStory[] = [];
+  const center: CuratedStory[] = [];
+  const right: CuratedStory[] = [];
+  const cols = [left, center, right];
 
-  const uncategorized = rest.filter((s) => !categorized.has(s));
-  const columns = [scienceHealth, communityHuman, justiceEnvironment];
+  remaining.forEach((story, i) => {
+    cols[i % 3].push(story);
+  });
 
-  for (const story of uncategorized) {
-    const shortest = columns.reduce((a, b) =>
-      a.length <= b.length ? a : b
-    );
-    shortest.push(story);
-  }
-
-  return { headline, scienceHealth, communityHuman, justiceEnvironment, innovation };
+  return {
+    banner,
+    top,
+    aboveFold: [],
+    columns: { left, center, right },
+    bottomBar: [],
+  };
 }
 
 export async function GET() {
   try {
     const stories = await getActiveStories();
-    const grouped = groupStories(stories);
+    const layout = layoutStories(stories);
 
     return NextResponse.json({
-      stories: grouped,
+      layout,
       total: stories.length,
       lastUpdated: stories[0]?.curated_at || null,
     });

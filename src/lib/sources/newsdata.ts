@@ -5,8 +5,16 @@ const NEWSDATA_BASE = "https://newsdata.io/api/1/latest";
 const POSITIVE_QUERIES = [
   "breakthrough OR milestone OR innovation",
   "rescued OR saved OR recovery",
-  "community OR volunteer OR charity",
-  "record OR achievement OR victory",
+  "community OR volunteer OR mutual aid",
+  "renewable energy OR solar OR wind power",
+  "species recovery OR conservation success",
+  "medical cure OR treatment advance",
+  "human rights victory OR civil rights",
+  "peace OR ceasefire OR reconciliation",
+  "rewilding OR reforestation OR restoration",
+  "indigenous rights OR land rights victory",
+  "protest victory OR court ruling justice",
+  "regenerative agriculture OR permaculture",
 ];
 
 interface NewsDataArticle {

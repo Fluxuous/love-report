@@ -1,4 +1,6 @@
-import { CuratedStory, ClaudeCurationResult } from "./types";
+import { CuratedStory } from "./types";
+import { MultiPassResult } from "./curation/claude";
+import { isBadImageUrl } from "./images";
 import crypto from "crypto";
 import { readFileSync, writeFileSync, existsSync, mkdirSync } from "fs";
 import path from "path";
@@ -8,7 +10,6 @@ const GIST_ID = process.env.GIST_ID || "d520253be8b5d0a4260192b75217fec0";
 const GIST_FILENAME = "stories.json";
 const GITHUB_TOKEN = process.env.GITHUB_TOKEN;
 
-// Local dev storage
 const DATA_DIR = path.join(process.cwd(), "data");
 const JSON_PATH = path.join(DATA_DIR, "stories.json");
 
@@ -16,7 +17,6 @@ const JSON_PATH = path.join(DATA_DIR, "stories.json");
 
 async function readGist(): Promise<CuratedStory[]> {
   try {
-    // Use GitHub API directly to avoid CDN caching on gist raw URLs
     const res = await fetch(
       `https://api.github.com/gists/${GIST_ID}`,
       {
@@ -104,16 +104,23 @@ export async function getActiveStories(): Promise<CuratedStory[]> {
   const stories = await readAll();
   return stories
     .filter((s) => s.is_active)
+    .map((s) => {
+      // Strip known-bad images (Google logos etc.) from stored data
+      if (s.image_url && isBadImageUrl(s.image_url)) {
+        return { ...s, image_url: undefined };
+      }
+      return s;
+    })
     .sort((a, b) => {
       if (a.is_headline && !b.is_headline) return -1;
       if (!a.is_headline && b.is_headline) return 1;
       return b.importance - a.importance;
     })
-    .slice(0, 50);
+    .slice(0, 100);
 }
 
 export async function upsertStories(
-  newStories: ClaudeCurationResult[]
+  newStories: MultiPassResult[]
 ): Promise<number> {
   const existing = await readAll();
   const now = new Date().toISOString();
@@ -136,11 +143,15 @@ export async function upsertStories(
     byUrl.set(story.url, {
       id,
       title: story.title,
+      display_title: story.display_title,
       url: story.url,
-      source: "",
+      source: story.source,
       category: story.category,
       importance: story.importance,
       summary: story.summary,
+      tier: story.tier,
+      column: story.column,
+      image_url: story.image_url,
       published_at: now,
       curated_at: now,
       is_headline: story.is_headline,
@@ -165,7 +176,6 @@ export async function archiveOldStories(hoursOld: number = 48): Promise<number> 
     }
   }
 
-  // Remove very old stories (> 7 days) entirely
   const weekAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString();
   const filtered = stories.filter((s) => s.curated_at >= weekAgo);
 

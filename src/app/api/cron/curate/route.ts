@@ -1,14 +1,14 @@
 import { NextRequest, NextResponse } from "next/server";
 import { fetchAllSources } from "@/lib/sources";
 import { keywordPreFilter } from "@/lib/curation/keywords";
-import { curateWithClaude } from "@/lib/curation/claude";
+import { curateWithClaude, getLastDiagnostics, getBatchErrors } from "@/lib/curation/claude";
+import { enrichWithOgImages } from "@/lib/images";
 import { upsertStories, archiveOldStories, getStoryCount } from "@/lib/db";
 
-export const maxDuration = 60; // Allow up to 60s for the full pipeline
+export const maxDuration = 60;
 export const dynamic = "force-dynamic";
 
 export async function GET(request: NextRequest) {
-  // Verify cron secret in production
   const authHeader = request.headers.get("authorization");
   const cronSecret = process.env.CRON_SECRET;
 
@@ -29,20 +29,34 @@ export async function GET(request: NextRequest) {
     const rawStories = await fetchAllSources();
     log.push(`Fetched ${rawStories.length} raw stories`);
 
-    // Step 2: Keyword pre-filter
-    const candidates = keywordPreFilter(rawStories, 50);
+    // Step 2: Keyword pre-filter to 200 candidates
+    const candidates = keywordPreFilter(rawStories, 200);
     log.push(`Keyword filter: ${candidates.length} candidates`);
 
-    // Step 3: AI curation with Claude
-    log.push("Sending to Claude for curation...");
+    // Step 3: Multi-pass AI curation with Claude
+    log.push("Running multi-pass Claude curation (4 batch + 1 final)...");
     const curated = await curateWithClaude(candidates);
-    log.push(`Claude selected ${curated.length} stories`);
+    log.push(`Claude curated ${curated.length} stories with tiers and display titles`);
 
-    // Step 4: Upsert into database
-    const inserted = await upsertStories(curated);
+    // Step 4: Enrich with OG images (skip if we're running low on time)
+    const elapsedSoFar = Date.now() - startTime;
+    let withImages = curated.filter((s) => s.image_url).length;
+    let enriched = curated;
+
+    if (elapsedSoFar < 45000) {
+      log.push(`Scraping OG images (${Math.round(elapsedSoFar / 1000)}s elapsed, budget ok)...`);
+      enriched = await enrichWithOgImages(curated);
+      withImages = enriched.filter((s) => s.image_url).length;
+      log.push(`OG enrichment: ${withImages}/${enriched.length} stories now have images`);
+    } else {
+      log.push(`Skipping OG scraping — ${Math.round(elapsedSoFar / 1000)}s elapsed, preserving time budget`);
+    }
+
+    // Step 5: Upsert into database
+    const inserted = await upsertStories(enriched);
     log.push(`Upserted ${inserted} stories into DB`);
 
-    // Step 5: Archive old stories
+    // Step 6: Archive old stories
     const archived = await archiveOldStories(48);
     log.push(`Archived ${archived} stories older than 48h`);
 
@@ -55,11 +69,14 @@ export async function GET(request: NextRequest) {
         raw: rawStories.length,
         filtered: candidates.length,
         curated: curated.length,
+        withImages,
         inserted,
         archived,
         totalActive,
         elapsed: `${elapsed}ms`,
       },
+      diagnostics: getLastDiagnostics(),
+      batchErrors: getBatchErrors(),
       log,
     });
   } catch (err) {

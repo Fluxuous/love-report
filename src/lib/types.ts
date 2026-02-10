@@ -6,21 +6,6 @@ export interface RawStory {
   published_at?: string;
 }
 
-export interface CuratedStory {
-  id: string;
-  title: string;
-  url: string;
-  source: string;
-  category: StoryCategory;
-  importance: number;
-  summary: string;
-  image_url?: string;
-  published_at: string;
-  curated_at: string;
-  is_headline: boolean;
-  is_active: boolean;
-}
-
 export type StoryCategory =
   | "health"
   | "environment"
@@ -28,22 +13,58 @@ export type StoryCategory =
   | "justice"
   | "community"
   | "human-interest"
-  | "innovation";
+  | "innovation"
+  | "culture"
+  | "education"
+  | "peace";
 
-export interface ClaudeCurationResult {
+export type StoryTier =
+  | "banner"
+  | "top"
+  | "above-fold"
+  | "column"
+  | "bottom-bar";
+
+export interface CuratedStory {
+  id: string;
   title: string;
+  display_title: string;
   url: string;
+  source: string;
+  category: StoryCategory;
+  importance: number;
+  summary: string;
+  tier: StoryTier;
+  column?: "left" | "center" | "right";
+  image_url?: string;
+  published_at: string;
+  curated_at: string;
+  is_headline: boolean;
+  is_active: boolean;
+}
+
+export interface ClaudeBatchResult {
+  index: number;
   importance: number;
   category: StoryCategory;
   summary: string;
-  is_headline: boolean;
 }
 
-/** Columns grouped for the 3-column layout */
-export interface ColumnGroup {
-  headline: CuratedStory | null;
-  scienceHealth: CuratedStory[];
-  communityHuman: CuratedStory[];
-  justiceEnvironment: CuratedStory[];
-  innovation: CuratedStory[];
+export interface ClaudeFinalResult {
+  index: number;
+  tier: StoryTier;
+  display_title: string;
+  column?: "left" | "center" | "right";
+}
+
+export interface DrudgeLayout {
+  banner: CuratedStory | null;
+  top: CuratedStory[];
+  aboveFold: CuratedStory[];
+  columns: {
+    left: CuratedStory[];
+    center: CuratedStory[];
+    right: CuratedStory[];
+  };
+  bottomBar: CuratedStory[];
 }

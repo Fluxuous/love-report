@@ -1,6 +1,7 @@
 import { RawStory } from "../types";
 
 const POSITIVE_KEYWORDS = [
+  // Original
   "breakthrough",
   "saved",
   "victory",
@@ -31,6 +32,48 @@ const POSITIVE_KEYWORDS = [
   "generous",
   "compassion",
   "remarkable",
+  // Nature & healing
+  "rewild",
+  "reforest",
+  "regenerat",
+  "ecosystem",
+  "species recover",
+  "coral",
+  "permaculture",
+  "indigenous",
+  "sacred",
+  // Human rights & resistance
+  "freed",
+  "acquit",
+  "overturn",
+  "rights",
+  "justice",
+  "union",
+  "cooperat",
+  "mutual aid",
+  "sovereignty",
+  "whistleblow",
+  "accountability",
+  "reparation",
+  "reconcil",
+  // Heroism & courage
+  "heroic",
+  "bystander",
+  "good samaritan",
+  "survived",
+  "miracle",
+  "daring",
+  "selfless",
+  "bravery",
+  "life-saving",
+  "lifesaving",
+  // Spirit & resilience
+  "resilien",
+  "solidarity",
+  "liberat",
+  "empower",
+  "dignity",
+  "healing",
 ];
 
 const NEGATIVE_KEYWORDS = [
@@ -85,7 +128,7 @@ function scoreHeadline(title: string): number {
  */
 export function keywordPreFilter(
   stories: RawStory[],
-  maxCandidates: number = 100
+  maxCandidates: number = 200
 ): RawStory[] {
   const scored = stories
     .map((story) => ({

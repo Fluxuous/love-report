@@ -18,17 +18,21 @@ export async function fetchAllSources(): Promise<RawStory[]> {
     all.push(...rssStories.value);
   }
 
-  // Deduplicate by URL
-  const seen = new Set<string>();
+  // Deduplicate by URL and by title (Google News produces same story from different queries)
+  const seenUrls = new Set<string>();
+  const seenTitles = new Set<string>();
   const unique: RawStory[] = [];
 
   for (const story of all) {
     // Normalize URL: strip trailing slash, strip query params for dedup
     const normalizedUrl = story.url.split("?")[0].replace(/\/$/, "");
-    if (!seen.has(normalizedUrl)) {
-      seen.add(normalizedUrl);
-      unique.push(story);
-    }
+    const normalizedTitle = story.title.toLowerCase().trim();
+
+    if (seenUrls.has(normalizedUrl) || seenTitles.has(normalizedTitle)) continue;
+
+    seenUrls.add(normalizedUrl);
+    seenTitles.add(normalizedTitle);
+    unique.push(story);
   }
 
   console.log(
