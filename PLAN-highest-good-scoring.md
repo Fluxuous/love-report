@@ -4,13 +4,15 @@
 
 What makes a story not just positive, but *good*? Not feel-good — genuinely, defensibly, across-all-traditions *good*?
 
-Every ethical and religious tradition in human history has tried to answer this. They disagree on a lot. But when you lay them side by side, six irreducible dimensions of goodness emerge — dimensions where traditions converge from completely different starting points. These aren't the story *categories* (science, justice, nature). They're the moral *axes* — the deep structure of why something matters.
+Every ethical and religious tradition in human history has tried to answer this. They disagree on a lot. But when you lay them side by side, seven irreducible dimensions of goodness emerge — dimensions where traditions converge from completely different starting points. These aren't the story *categories* (science, justice, nature). They're the moral *axes* — the deep structure of why something matters.
 
-A story can score high on one and low on another. That tension is the point. It's what makes this interesting, not a rubber stamp.
+A story can score high on one and low on another. That tension is the point. It's what makes this interesting, not a rubber stamp. Grace pulls against Justice. Courage pulls against Harmony. Transcendence pulls against Impact. These contradictions aren't a flaw in the framework — they're a reflection of the actual structure of moral reality. Every wisdom tradition that has ever grappled with "the good" has discovered that goodness is not a single thing. It's a living tension between irreducible values, and the greatest moral acts are the ones that hold multiple tensions at once without collapsing into simplicity.
+
+This framework is not a verdict. It's a mirror — held up to the news of the day, reflecting back the moral inheritance of every tradition that tried to answer the question. The score is a lens, not a ruling. The tensions are the understanding.
 
 ---
 
-## The Six Measures of Good
+## The Seven Measures of Good
 
 ### 1. COURAGE (Andreia)
 *"What did it cost?"*
@@ -95,7 +97,31 @@ Does this demonstrate that human flourishing and ecological flourishing are inse
 
 ---
 
-### 6. TRANSCENDENCE (Nishkama Karma)
+### 6. GRACE (Charis)
+*"Was good extended across a divide?"*
+
+This is the Sermon on the Mount distilled to its moral core. Not institutional Christianity — the actual teaching of the rabbi from Nazareth, as Jefferson tried to isolate it. Did someone extend goodness to a person or group that **didn't deserve it, didn't earn it, and might even be their enemy**? Did this story cross a boundary of tribe, ideology, history, or grievance to offer something unearned?
+
+This is what separates compassion from *radical* compassion. Compassion for a suffering child is natural. Compassion for the person who wronged you — or for someone your whole community tells you to hate — is a different moral act entirely. It breaks cycles. It's the Good Samaritan: the point isn't that he helped, it's that he helped *across the most toxic ethnic divide of his world*. It's "forgive them, for they know not what they do" — spoken while being executed.
+
+This dimension is in **genuine tension with Justice**, and that tension is the point. Justice says: hold the powerful accountable, redistribute. Grace says: even after accountability, choose reconciliation over revenge. The greatest moral stories navigate both — they don't sacrifice justice for cheap grace, and they don't sacrifice grace for righteous vengeance.
+
+**Philosophical roots:**
+- **Jesus of Nazareth** (Jefferson Bible) — "Love your enemies, do good to those who hate you" (Luke 6:27). The Good Samaritan. Forgive seventy times seven. "What you do to the least of these, you do to me." The entire Sermon on the Mount as an ethics of radical inclusion.
+- **Desmond Tutu / Ubuntu** — Truth and Reconciliation: the moral choice to pursue *restoration* over retribution. "My humanity is bound up in yours."
+- **Gandhi** — *satyagraha* (truth-force): the goal is not to defeat the opponent but to *transform* them. Win the person, not the argument.
+- **Martin Luther King Jr.** — the Beloved Community: "Darkness cannot drive out darkness; only light can do that." Redemptive suffering that converts the oppressor.
+- **Thich Nhat Hanh** — understanding the suffering *of your enemy* as the path to peace. "When you call me by my true names" — the poem about being both the pirate and the girl.
+- **Jewish tradition** — *teshuvah* (repentance/return) and the requirement to seek reconciliation with those you've wronged *before* seeking God's forgiveness (Yom Kippur)
+- **Confucianism** — *shu* (恕, reciprocity/forgiveness): "Do not impose on others what you do not wish for yourself"
+
+**High:** Former enemies collaborating, community forgiving the person who harmed them, aid sent to a hostile nation's civilians, truth and reconciliation processes, someone breaking a generational cycle of hate
+**Low:** Help given to allies, aid with political strings attached, forgiveness performed for PR
+
+---
+
+### 7. TRANSCENDENCE (Nishkama Karma)
+
 *"Does this exceed what self-interest can explain?"*
 
 This is the hardest to measure and the most important. Does the goodness in this story **surpass what can be explained by incentives, strategy, or obligation**? Is there something in it that is purely, inexplicably generous — selfless not as a tactic but as an expression of something deeper? This is what separates the extraordinary from the merely good.
@@ -121,21 +147,45 @@ highest_good = (
   justice       * w3 +
   compassion    * w4 +
   harmony       * w5 +
-  transcendence * w6
+  grace         * w6 +
+  transcendence * w7
 ) / max_possible * 100
 ```
 
-Default weights (equal): each dimension is 1/6. But the weights themselves are a philosophical statement — and the About page should acknowledge this honestly. Weighting Impact highest is a utilitarian choice. Weighting Courage highest is an existentialist choice. There's no neutral weighting. The site makes its values visible rather than hiding them.
+Default weights (equal): each dimension is 1/7. But the weights themselves are a philosophical statement — and the About page should acknowledge this honestly. Weighting Impact highest is a utilitarian choice. Weighting Courage highest is an existentialist choice. Weighting Grace highest is a Christian one. There's no neutral weighting. The site makes its values visible rather than hiding them.
 
 **Possible editorial weighting (Love Report's voice):**
-- Courage: 0.20 (heroism is the rarest and most precious)
-- Impact: 0.15
-- Justice: 0.20 (the site exists to highlight structural change)
-- Compassion: 0.15
-- Harmony: 0.15
-- Transcendence: 0.15
+- Courage: 0.18 (heroism is the rarest and most precious)
+- Impact: 0.12
+- Justice: 0.18 (the site exists to highlight structural change)
+- Compassion: 0.12
+- Harmony: 0.12
+- Grace: 0.16 (for a site called Love Report, love across enmity is core)
+- Transcendence: 0.12
 
 This is debatable and should be. The About page presents it as a choice, not a truth.
+
+### The Paradox Is the Point
+
+Some of the most interesting moral stories are the ones where dimensions *conflict*:
+
+- **Grace vs. Justice:** South Africa chose Truth and Reconciliation over tribunals. Grace goes up. Some would say Justice went down. Who's right?
+- **Courage vs. Harmony:** A whistleblower disrupts an entire system to expose truth. The system was stable; now it's not. Courageous? Absolutely. Harmonious? The opposite.
+- **Impact vs. Transcendence:** A billionaire's foundation saves millions of lives. Massive Impact. But the Transcendence score depends on *why* — tax strategy, legacy, or genuine selflessness? The number can't answer that. The tension can.
+- **Compassion vs. Justice:** A community shelters an undocumented family. Compassion is maximal. Depending on your theory of justice, the Justice score could go either direction.
+
+These tensions are not flaws in the scoring system. They ARE the scoring system. They reflect the actual structure of moral disagreement across traditions. The composite flattens them into a number; the dimension breakdown preserves the argument.
+
+### Future: AI Score vs. Human Score
+
+The current system is AI-scored: Claude reads each story and assigns dimension scores based on the framework. But an AI's moral intuitions are trained on text, not lived experience. A future version introduces a **Rotten Tomatoes-style dual score**:
+
+- **AI Score** (the current pipeline) — consistent, scalable, philosophically grounded but ultimately synthetic
+- **Human Score** — readers vote on each dimension for each story, creating a collective moral judgment
+
+The gap between AI and human scores is itself data. Where do humans and AI agree? Where do they diverge? What does that tell us about our moral intuitions vs. our philosophical frameworks? The site becomes not just a mirror but a **participatory experiment in collective ethics**.
+
+This is a v3 feature, but the data model should support it from the start: `ai_scores` and `human_scores` as separate fields, with the displayed composite being a configurable blend.
 
 ---
 
@@ -156,12 +206,13 @@ The existing batch prompt asks for a single `importance: 1-10` score. Replace wi
     "justice": 9,
     "compassion": 6,
     "harmony": 10,
+    "grace": 3,
     "transcendence": 4
   }
 }
 ```
 
-The prompt includes a concise explanation of each dimension (2-3 sentences each, drawn from the descriptions above) so Claude scores consistently.
+The prompt includes a concise explanation of each dimension (2-3 sentences each, drawn from the descriptions above) so Claude scores consistently. The prompt should also note the key tensions (Grace vs. Justice, Courage vs. Harmony) so the scorer doesn't try to make everything consistent — contradictions are signal, not noise.
 
 ### Composite Computation
 Done server-side in a new `src/lib/curation/scoring.ts` module after batch curation, before final ranking. The composite score replaces `importance` as the primary sort key.
@@ -177,15 +228,17 @@ interface EthicalScores {
   justice: number;        // 0-10
   compassion: number;     // 0-10
   harmony: number;        // 0-10
+  grace: number;          // 0-10
   transcendence: number;  // 0-10
 }
 
 // Added to CuratedStory:
-ethical_scores?: EthicalScores;
-highest_good?: number; // 0-100 composite
+ai_scores?: EthicalScores;       // Claude's scoring
+human_scores?: EthicalScores;    // Future: aggregated reader votes
+highest_good?: number;           // 0-100 composite (from ai_scores initially)
 ```
 
-Token/cost impact: ~50 extra output tokens per story per batch. At Haiku pricing: < $0.002 extra per curation run. **Negligible.**
+Token/cost impact: ~60 extra output tokens per story per batch (7 scores instead of 6). At Haiku pricing: < $0.003 extra per curation run. **Negligible.**
 
 ---
 
@@ -196,20 +249,28 @@ Pure CSS, no JS library. On hover over any story link:
 
 ```
 ┌──────────────────────────────────────┐
-│  HIGHEST GOOD: 82                    │
+│  HIGHEST GOOD: 78                    │
 │──────────────────────────────────────│
 │  ████████░░  COURAGE           8  │
 │  █████████░  IMPACT            9  │
 │  █████████░  JUSTICE           9  │
 │  ██████░░░░  COMPASSION        6  │
 │  ██████████  HARMONY          10  │
+│  ███░░░░░░░  GRACE             3  │
 │  ████░░░░░░  TRANSCENDENCE     4  │
 │──────────────────────────────────────│
 │  "Court protects Amazon from mining" │
 └──────────────────────────────────────┘
 ```
 
-Each dimension name links (on click/tap) to its section on the About page. Bar colors can map to dimension (warm red for courage, gold for impact, violet for justice, green for compassion, blue for harmony, white/silver for transcendence).
+Each dimension name links (on click/tap) to its section on the About page. Bar colors map to dimension:
+- **Courage** — warm red (the color of blood, risk)
+- **Impact** — gold (the weight of consequence)
+- **Justice** — violet (the color of royalty inverted — power to the powerless)
+- **Compassion** — green (life, growth, tenderness)
+- **Harmony** — blue (sky, ocean, the web of life)
+- **Grace** — rose/pink (the color of unearned love)
+- **Transcendence** — white/silver (beyond the visible spectrum)
 
 ### Visual Cues
 - **Red links**: composite >= 85
@@ -221,11 +282,39 @@ Each dimension name links (on click/tap) to its section on the About page. Bar c
 
 Sections:
 1. **What is Love Report** — "This is not a feel-good site. This is evidence that life is winning."
-2. **The Highest Good** — The six dimensions, each with its philosophical roots and real examples
-3. **The Composite** — How the score is calculated, what the weights mean, why there's no "neutral" weighting
-4. **The Traditions** — A brief, respectful tour: Aristotle, Kant, Mill, Rawls, Buddha, Confucius, Lao Tzu, Torah, Gospel, Quran, Ubuntu, Indigenous wisdom. Not a textbook — a gesture of gratitude to the traditions that inform this work.
-5. **Methodology** — Sources, AI curation, scoring pipeline, limitations
-6. **An Honest Caveat** — "No algorithm captures goodness. This is an attempt, not an answer. The score is a lens, not a verdict."
+2. **The Highest Good** — The seven dimensions, each with its philosophical roots and real examples. Not presented as a definitive taxonomy but as a *lens* — one way of looking at an infinite subject.
+3. **The Tensions** — Why Grace and Justice pull against each other. Why Courage and Harmony conflict. Why the contradictions are features, not bugs. This section is the intellectual heart of the About page — it's what makes this more than a scoring system.
+4. **The Composite** — How the score is calculated, what the weights mean, why there's no "neutral" weighting. "Weighting Courage highest is an existentialist choice. Weighting Grace highest is a Christian one. We chose ours; you might choose differently."
+5. **The Traditions** — A brief, respectful tour: Aristotle, Kant, Mill, Rawls, Buddha, Confucius, Lao Tzu, Torah, Sermon on the Mount, Quran, Sufi poets, Ubuntu, Maat, Māori kaitiakitanga, Andean sumak kawsay, Sikh sant-sipahi, Dalit philosophy, MLK, Gandhi, Thich Nhat Hanh, Levinas. Not a textbook — a gesture of gratitude to the traditions that inform this work and an acknowledgment that no framework can contain them.
+6. **Methodology** — Sources, AI curation, scoring pipeline, limitations. Honest about the fact that an AI is making these judgments.
+7. **The Invitation** — "No algorithm captures goodness. This is an attempt, not an answer. The score is a lens, not a verdict. Someday we want you to score alongside the AI — because the question of what is good is too important to leave to any single intelligence, artificial or otherwise."
+
+---
+
+## Candidate 8th Dimension: TRUTH (Satya / Maat)
+
+*"Did this make hidden reality visible?"*
+
+There's a moral quality in truth-telling — a journalist's exposé, a scientist's paradigm shift, a community finally speaking its real history — that the seven dimensions don't directly capture. You can be courageous without revealing truth. You can have enormous impact without truth-telling. Truth is the act of aligning understanding with reality.
+
+**Philosophical roots:**
+- **Egyptian Maat** — truth as the foundation of cosmic order; the heart weighed against the feather of truth
+- **Gandhi** — "Truth is God" — *satya* as the first principle; *satyagraha* = "truth-force"
+- **Sikh tradition** — *Sat* (truth) as the first attribute: "Ek Onkar Sat Nam" (One God, Truth is His Name)
+- **Socrates** — chose death over abandoning the examined life; the truth-seeker as moral archetype
+- **Islam** — *sidq* (truthfulness); "Stand firm for justice as witnesses to God, even against yourselves" (Quran 4:135)
+- **Jewish** — *emet* (truth): "The world stands on three things: justice, truth, and peace" (Pirkei Avot 1:18)
+- **Buddhism** — Right Speech (*sammā vācā*) and Right View (*sammā diṭṭhi*) as foundational path elements
+- **Indigenous traditions** — oral history and storytelling as sacred truth-keeping; the moral weight of bearing witness
+
+**High:** Whistleblower reveals systemic corruption, scientist publishes findings against their own interest, truth commission documents historical atrocities, journalist spends years uncovering what was hidden
+**Low:** Story that is true but doesn't involve the act of truth-telling or truth-revealing
+
+**The case for including it:** Many traditions (Egyptian, Sikh, Gandhian, Jewish) place truth alongside or above justice as a foundational moral principle. A whistleblower who reveals corruption at no personal risk (anonymous, protected) might score low on Courage but the moral weight of the truth itself deserves recognition.
+
+**The case against:** For a news aggregator, every story is presumably true reporting. Does the truth dimension differentiate enough? And does it overlap too much with Courage (the cost of speaking truth) and Justice (the structural change truth enables)?
+
+**Decision: TBD** — leaving this as an open question for the implementation phase. The data model can accommodate an 8th dimension without structural changes.
 
 ---
 
@@ -233,28 +322,28 @@ Sections:
 
 | File | Action | Description |
 |------|--------|-------------|
-| `src/lib/types.ts` | Modify | Add `EthicalScores`, `highest_good` to `CuratedStory` and `ClaudeBatchResult` |
-| `src/lib/curation/scoring.ts` | **New** | `computeHighestGood()` with configurable weights |
-| `src/lib/curation/claude.ts` | Modify | Batch prompt: explain 6 dimensions, request scores. Final prompt: receive composite. |
-| `src/lib/db.ts` | Modify | Pass through `ethical_scores` and `highest_good` |
+| `src/lib/types.ts` | Modify | Add `EthicalScores` (7 dimensions), `ai_scores`, `human_scores`, `highest_good` to types |
+| `src/lib/curation/scoring.ts` | **New** | `computeHighestGood()` with configurable weights, dimension metadata |
+| `src/lib/curation/claude.ts` | Modify | Batch prompt: explain 7 dimensions + their tensions, request scores |
+| `src/lib/db.ts` | Modify | Pass through scores and composite |
 | `src/app/page.tsx` | Modify | Sort by `highest_good`, update red/italic thresholds |
-| `src/components/ScoreTooltip.tsx` | **New** | Hover tooltip with colored bar chart per dimension |
+| `src/components/ScoreTooltip.tsx` | **New** | Hover tooltip with colored bar chart per dimension, links to About |
 | `src/components/DrudgeColumn.tsx` | Modify | Wrap links with ScoreTooltip |
 | `src/components/TopStories.tsx` | Modify | Wrap links with ScoreTooltip |
 | `src/components/Banner.tsx` | Modify | Show composite score |
-| `src/app/globals.css` | Modify | Tooltip positioning, bar styles, dimension colors |
-| `src/app/about/page.tsx` | **New** | Full About page |
-| `src/app/about/globals.css` or inline | **New** | About page styling (prose-friendly) |
+| `src/app/globals.css` | Modify | Tooltip positioning, bar styles, 7 dimension colors |
+| `src/app/about/page.tsx` | **New** | Full About page with philosophical framework |
+| `src/app/about/about.css` | **New** | About page styling (prose-friendly, dimension color accents) |
 
 ## Build Order
 
-1. Types + scoring module
-2. Claude prompt rewrite (the hard part — getting 6 consistent scores)
+1. Types + scoring module (7 dimensions, configurable weights)
+2. Claude prompt rewrite (the hard part — explaining 7 dimensions + tensions, getting consistent scores)
 3. Pipeline wiring
-4. ScoreTooltip component + CSS
+4. ScoreTooltip component + CSS (7 colored bars)
 5. Story components updated with tooltips
 6. Page sorting by composite
-7. About page content
+7. About page — the philosophical content (this is as important as the code)
 8. Test full cycle
 9. Deploy
 
@@ -266,3 +355,6 @@ Sections:
 2. **Should the composite be visible as a number or just as relative bar lengths?** — number feels more honest and Drudge-like
 3. **Mobile tooltip UX** — hover doesn't work on touch. Tap-to-expand? Small inline badge instead?
 4. **Backward compat** — stories without scores fall back to `importance` for sorting, no tooltip shown
+5. **Truth as 8th dimension?** — philosophically defensible, decision deferred to implementation
+6. **Human scoring UX** — how do readers vote? Per-dimension sliders? Simple up/down per dimension? This is a v3 design question but worth thinking about now
+7. **Weight transparency** — should the About page show the exact weights, or just describe the philosophy? (Showing them is more honest)
