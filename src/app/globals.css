@@ -215,7 +215,7 @@ body.show-scores .score-inline {
   z-index: 100;
   left: 0;
   top: 1.4em;
-  width: 230px;
+  width: 280px;
   background: #ffffff;
   border: 1px solid #000000;
   padding: 8px 10px;
@@ -261,7 +261,7 @@ body.show-scores .story-row:hover .score-tooltip {
   display: flex;
   align-items: center;
   gap: 2px;
-  width: 85px;
+  width: 95px;
   flex-shrink: 0;
   text-decoration: none;
   color: #000000;
@@ -458,7 +458,7 @@ body.show-scores .story-row:hover .score-tooltip {
     top: 50% !important;
     transform: translate(-50%, -50%);
     margin-left: 0;
-    width: 260px;
+    width: 300px;
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
   }
 }
