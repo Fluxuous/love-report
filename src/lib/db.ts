@@ -154,7 +154,7 @@ export async function upsertStories(
       tier: story.tier,
       column: story.column,
       image_url: story.image_url,
-      published_at: now,
+      published_at: story.published_at || now,
       curated_at: now,
       is_headline: story.is_headline,
       is_active: true,

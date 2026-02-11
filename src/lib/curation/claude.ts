@@ -26,7 +26,9 @@ function extractJsonArray(text: string): string {
   return cleaned.slice(start);
 }
 
-const BATCH_SYSTEM_PROMPT = `You are the editor of Love Report — a global lens on the best of what humanity is becoming. This is not a feel-good site. This is evidence that the world is healing, that people are brave, that nature is resilient, and that the arc bends toward justice when people bend it.
+function getBatchSystemPrompt(): string {
+  const today = new Date().toISOString().split("T")[0];
+  return `You are the editor of Love Report — a global lens on the best of what humanity is becoming. This is not a feel-good site. This is evidence that the world is healing, that people are brave, that nature is resilient, and that the arc bends toward justice when people bend it.
 
 Your editorial philosophy: find proof that life is winning.
 
@@ -77,6 +79,7 @@ WHAT YOU SEEK (in order of editorial priority):
 GLOBAL LENS: Prioritize stories from OUTSIDE the US/UK/Europe. Africa, Asia, Latin America, Pacific Islands, Indigenous nations everywhere — these stories are underrepresented and often the most powerful. A story about a village in Bangladesh solving its own water crisis is worth more than another US tech company announcement.
 
 REJECT:
+- OLD NEWS: Today's date is ${today}. REJECT any story about events that clearly happened weeks, months, or years ago. RSS feeds frequently recirculate old articles with fresh timestamps. If you recognize a story as old news, reject it.
 - Feel-good fluff ("dog reunited with owner", "strangers pay for meal")
 - Corporate PR and greenwashing
 - Clickbait with no lasting impact
@@ -120,6 +123,7 @@ For each selected story, return a JSON array of objects with keys:
 - scores: { courage: 0.0, impact: 0.0, justice: 0.0, compassion: 0.0, harmony: 0.0, grace: 0.0, truth: 0.0, transcendence: 0.0 }
 
 Select 15-25 stories per batch. Be generous — let good stories through. Return ONLY valid JSON.`;
+}
 
 const FINAL_SYSTEM_PROMPT = `You are the editor-in-chief of Love Report, styling headlines in the voice of the Drudge Report. Your job: assign tiers and rewrite every headline in dramatic, punchy Drudge style.
 
@@ -176,7 +180,7 @@ async function runBatchCuration(
     const message = await client.messages.create({
       model: "claude-haiku-4-5-20251001",
       max_tokens: 4096,
-      system: BATCH_SYSTEM_PROMPT,
+      system: getBatchSystemPrompt(),
       messages: [
         {
           role: "user",
@@ -294,6 +298,7 @@ export interface MultiPassResult {
   url: string;
   source: string;
   image_url?: string;
+  published_at?: string;
   importance: number;
   category: StoryCategory;
   summary: string;
@@ -421,6 +426,7 @@ export async function curateWithClaude(
       url: survivor.story.url,
       source: survivor.story.source,
       image_url: survivor.story.image_url,
+      published_at: survivor.story.published_at,
       importance: survivor.importance,
       category: survivor.category,
       summary: survivor.summary,

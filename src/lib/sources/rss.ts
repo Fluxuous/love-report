@@ -103,7 +103,7 @@ const GOOGLE_NEWS_QUERIES = [
 ];
 
 function googleNewsRssUrl(query: string): string {
-  return `https://news.google.com/rss/search?q=${encodeURIComponent(query)}&hl=en-US&gl=US&ceid=US:en`;
+  return `https://news.google.com/rss/search?q=${encodeURIComponent(query + " when:1d")}&hl=en-US&gl=US&ceid=US:en`;
 }
 
 function extractImageUrl(item: Record<string, Record<string, Record<string, string>>>): string | undefined {
