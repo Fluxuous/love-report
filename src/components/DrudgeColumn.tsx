@@ -36,7 +36,7 @@ export default function DrudgeColumn({ groups }: { groups: StoryGroup[] }) {
               .join(" ") || undefined;
 
             return (
-              <div key={story.id}>
+              <div key={story.id} className="story-row">
                 {showImage && story.image_url && (
                   // eslint-disable-next-line @next/next/no-img-element
                   <img src={story.image_url} alt="" />

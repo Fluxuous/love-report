@@ -18,7 +18,7 @@ export default function TopStories({ stories }: { stories: CuratedStory[] }) {
         const score = story.highest_good ?? story.importance;
         const isHighImportance = score >= 8.5;
         return (
-          <span key={story.id} style={{ display: "block" }}>
+          <span key={story.id} className="story-row" style={{ display: "block" }}>
             <a
               href={story.url}
               target="_blank"

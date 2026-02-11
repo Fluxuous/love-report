@@ -16,8 +16,11 @@ export default function Banner({ story }: { story: CuratedStory }) {
           &apos;{title}&apos;
         </a>
       </div>
-      <div className="lr-logo">LOVE REPORT</div>
-      <div className="lr-hearts">&#10084;&#65039; &#10084;&#65039; &#10084;&#65039;</div>
+      <div className="lr-logo">
+        <span className="lr-heart-left">&#10084;&#65039;</span>
+        {" LOVE REPORT "}
+        <span className="lr-heart-right">&#10084;&#65039;</span>
+      </div>
     </div>
   );
 }

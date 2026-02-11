@@ -2,7 +2,7 @@ import { DIMENSION_META, DEFAULT_WEIGHTS } from "@/lib/curation/scoring";
 import Footer from "@/components/Footer";
 
 export const metadata = {
-  title: "About — LOVE REPORT",
+  title: "About | LOVE REPORT",
   description: "The philosophy behind the Highest Good scoring framework.",
 };
 
@@ -19,11 +19,11 @@ export default function AboutPage() {
           This is not a feel-good site. This is evidence that life is winning.
         </p>
         <p>
-          Love Report surfaces proof that the world is healing, that people are
-          brave, that nature is resilient, and that the arc bends toward justice
-          when people bend it. We aggregate hundreds of sources, use AI to curate
-          the stories that actually matter, and present them in a format that
-          respects your time and intelligence.
+          Love Report surfaces stories showing the world is healing, that people
+          are brave, that nature is resilient, and that the arc bends toward
+          justice when people bend it. We aggregate hundreds of sources, use AI
+          to curate the stories that actually matter, and present them in a
+          format that respects your time and intelligence.
         </p>
       </section>
 
@@ -33,19 +33,24 @@ export default function AboutPage() {
         <h1>The Highest Good</h1>
         <p>
           What makes a story not just positive, but <em>good</em>? Not
-          feel-good — genuinely, defensibly, across-all-traditions good?
+          feel-good, but genuinely, defensibly, across-traditions good?
         </p>
         <p>
           Every ethical and religious tradition in human history has tried to
           answer this. They disagree on a lot. But when you lay them side by
-          side, eight irreducible dimensions of goodness emerge — dimensions
+          side, eight dimensions of goodness keep showing up. Dimensions
           where traditions converge from completely different starting points.
         </p>
         <p>
+          We probably can&apos;t get this right. Not fully. But the pursuit
+          matters more than the precision, and we think the attempt is worth
+          making honestly and in the open.
+        </p>
+        <p>
           These aren&apos;t the story categories (science, justice, nature).
-          They&apos;re the moral axes — the deep structure of why something
-          matters. A story can score high on one and low on another. That tension
-          is the point.
+          They&apos;re the moral axes. The deep structure of why something
+          matters. A story can score high on one and low on another. That
+          tension is the point.
         </p>
 
         {DIMENSION_META.map((dim) => (
@@ -69,7 +74,7 @@ export default function AboutPage() {
         <p>
           Some of the most interesting moral stories are the ones where
           dimensions <em>conflict</em>. These contradictions aren&apos;t a flaw
-          in the framework — they&apos;re a reflection of the actual structure of
+          in the framework. They&apos;re a reflection of the actual structure of
           moral reality.
         </p>
 
@@ -78,15 +83,15 @@ export default function AboutPage() {
           South Africa chose Truth and Reconciliation over tribunals. Grace goes
           up. Some would say Justice went down. Who&apos;s right? Justice says:
           hold the powerful accountable. Grace says: even after accountability,
-          choose reconciliation over revenge. The greatest moral stories navigate
-          both.
+          choose reconciliation over revenge. The greatest moral stories
+          navigate both.
         </p>
 
         <h3>Truth vs. Compassion</h3>
         <p>
           A doctor delivers a devastating diagnosis with unflinching honesty. A
           historian forces a nation to confront atrocities its people would
-          rather forget. Truth demands clarity; Compassion might counsel
+          rather forget. Truth demands clarity. Compassion might counsel
           gentleness. Both are right. That&apos;s the paradox.
         </p>
 
@@ -100,7 +105,7 @@ export default function AboutPage() {
         <h3>Impact vs. Transcendence</h3>
         <p>
           A billionaire&apos;s foundation saves millions of lives. Massive
-          Impact. But the Transcendence score depends on <em>why</em> — tax
+          Impact. But the Transcendence score depends on <em>why</em>. Tax
           strategy, legacy, or genuine selflessness? The number can&apos;t
           answer that. The tension can.
         </p>
@@ -112,8 +117,8 @@ export default function AboutPage() {
         <h1>The Composite</h1>
         <p>
           The Highest Good score is a weighted sum of all eight dimensions,
-          producing a single 0.0–10.0 number — like a Pitchfork album rating,
-          not a percentage. The current editorial weights:
+          producing a single 0.0 to 10.0 number, like a Pitchfork album rating
+          rather than a percentage. The current editorial weights:
         </p>
         <div className="about-weights">
           {DIMENSION_META.map((dim) => (
@@ -129,7 +134,7 @@ export default function AboutPage() {
           There is no neutral weighting. Weighting Courage highest is an
           existentialist choice. Weighting Grace highest is a Christian one.
           Weighting Impact highest is utilitarian. Weighting Truth highest is
-          Gandhian. We chose ours — you might choose differently. The weights
+          Gandhian. We chose ours. You might choose differently. The weights
           themselves are a philosophical statement, and we make them visible
           rather than hiding them.
         </p>
@@ -180,11 +185,11 @@ export default function AboutPage() {
           </li>
         </ol>
         <p>
-          We are honest about the limitations: an AI&apos;s moral intuitions are
-          trained on text, not lived experience. The scores are consistent and
-          philosophically grounded but ultimately synthetic. A future version
-          will introduce human scoring alongside AI — because the question of
-          what is good is too important to leave to any single intelligence.
+          We should be honest about what this is and isn&apos;t. An AI&apos;s
+          moral intuitions are trained on text, not lived experience. The scores
+          are consistent and philosophically grounded, but they&apos;re
+          ultimately synthetic. They&apos;re a starting point for thinking about
+          what matters, not a final word on it.
         </p>
       </section>
 
@@ -193,12 +198,13 @@ export default function AboutPage() {
       <section className="about-section">
         <h1>The Invitation</h1>
         <p>
-          No algorithm captures goodness. This is an attempt, not an answer. The
-          score is a lens, not a verdict. The tensions between dimensions are the
-          understanding — not the number that flattens them.
+          You can&apos;t really get this right. We know that. No algorithm
+          captures goodness. This is a pursuit, not an answer. The score is a
+          lens, not a verdict. The tensions between dimensions are where the
+          understanding lives, not the number that flattens them.
         </p>
         <p>
-          Someday we want you to score alongside the AI — because the question
+          Someday we want you to score alongside the AI, because the question
           of what is good is too important to leave to any single intelligence,
           artificial or otherwise.
         </p>
@@ -213,30 +219,30 @@ function DimensionDescription({ dimensionKey }: { dimensionKey: string }) {
   const descriptions: Record<string, React.ReactNode> = {
     courage: (
       <p>
-        Did someone risk something real — their safety, reputation, freedom,
-        livelihood — to do this? Aristotle called <em>andreia</em> the
-        foundational virtue, without which no other virtue can be exercised.
-        From Kierkegaard&apos;s leap of faith to the Sikh <em>sant-sipahi</em>,
-        courage in defense of the oppressed is spiritual duty. A whistleblower
-        who loses everything: maximum. Good policy passed by committee: low.
+        Did someone risk something real? Their safety, reputation, freedom,
+        livelihood? Aristotle called <em>andreia</em> the foundational virtue,
+        without which no other virtue can be exercised. From Kierkegaard&apos;s
+        leap of faith to the Sikh <em>sant-sipahi</em>, courage in defense of
+        the oppressed is spiritual duty. A whistleblower who loses everything:
+        maximum. Good policy passed by committee: low.
       </p>
     ),
     impact: (
       <p>
         How many beings benefit? How deeply? How lastingly? This is the cold
-        math of goodness — magnitude times breadth times duration. From
+        math of goodness: magnitude times breadth times duration. From
         Bentham&apos;s greatest good for the greatest number to Islamic{" "}
         <em>maslaha</em> (public interest) to Buddhist <em>upaya</em> (skillful
-        means), traditions agree: scale matters.
+        means), traditions agree that scale matters.
       </p>
     ),
     justice: (
       <p>
-        Not just good outcomes — <em>fair</em> ones. Does this redistribute
+        Not just good outcomes, but <em>fair</em> ones. Does this redistribute
         power toward those systematically denied it? From Rawls&apos; veil of
         ignorance to <em>tzedek tzedek tirdof</em> (&ldquo;justice, justice you
         shall pursue&rdquo;) to Ubuntu&apos;s &ldquo;I am because we
-        are&rdquo; — justice is structural. Indigenous land returned, workers
+        are.&rdquo; Justice is structural. Indigenous land returned, workers
         winning against exploitation, the powerful held accountable.
       </p>
     ),
@@ -244,7 +250,7 @@ function DimensionDescription({ dimensionKey }: { dimensionKey: string }) {
       <p>
         Is there warmth in this story? The Buddha&apos;s <em>karuna</em>,
         Christianity&apos;s <em>agape</em>, Judaism&apos;s <em>chesed</em>,
-        Confucius&apos; <em>ren</em> — every tradition places care for the
+        Confucius&apos; <em>ren</em>. Every tradition places care for the
         suffering at or near its center. Impact counts bodies; Compassion counts
         tears. A community sheltering refugees at its own expense. Forgiveness
         across deep wounds.
@@ -255,7 +261,7 @@ function DimensionDescription({ dimensionKey }: { dimensionKey: string }) {
         Does this demonstrate that human flourishing and ecological flourishing
         are inseparable? The Tao&apos;s <em>wu wei</em>, Andean{" "}
         <em>sumak kawsay</em>, M&#257;ori <em>kaitiakitanga</em>, the Seventh
-        Generation Principle — humans as stewards, not owners, of the living
+        Generation Principle. Humans as stewards, not owners, of the living
         world. Species pulled from extinction, rewilding, regenerative
         agriculture.
       </p>
@@ -267,12 +273,12 @@ function DimensionDescription({ dimensionKey }: { dimensionKey: string }) {
         the Sermon on the Mount distilled. Gandhi&apos;s <em>satyagraha</em>,
         Tutu&apos;s Truth and Reconciliation, King&apos;s Beloved Community,
         Thich Nhat Hanh&apos;s understanding the suffering of your enemy. Grace
-        is in genuine tension with Justice — and that tension is the point.
+        is in genuine tension with Justice, and that tension is the point.
       </p>
     ),
     truth: (
       <p>
-        Truth-telling as a moral act — the deliberate choice to make hidden
+        Truth-telling as a moral act. The deliberate choice to make hidden
         reality visible. Egyptian <em>Maat</em> placed truth as the foundation
         of cosmic order. Gandhi called truth God itself:{" "}
         <em>satyagraha</em> means truth-force. Without truth, justice is

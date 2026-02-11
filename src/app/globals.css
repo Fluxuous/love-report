@@ -95,11 +95,11 @@ hr {
   text-shadow: 3px 3px 0px #d0d0d0, 4px 4px 0px #b0b0b0;
 }
 
-.lr-hearts {
-  font-size: 24px;
-  line-height: 1;
-  margin-top: 4px;
-  letter-spacing: 6px;
+.lr-heart-left,
+.lr-heart-right {
+  font-size: 50px;
+  vertical-align: middle;
+  display: inline;
   animation: pulse-hearts 2s ease-in-out infinite;
 }
 
@@ -222,7 +222,16 @@ body.show-scores .score-inline {
   font-size: 11px;
   line-height: 1.3;
   box-shadow: 2px 2px 0 rgba(0, 0, 0, 0.1);
+  display: none;
+}
+
+/* Show tooltip on row hover when scores are toggled on */
+body.show-scores .story-row:hover .score-tooltip {
   display: block;
+}
+
+.story-row {
+  position: relative;
 }
 
 .score-tooltip-header {
@@ -434,9 +443,9 @@ body.show-scores .score-inline {
     letter-spacing: -1px;
     text-shadow: 2px 2px 0px #d0d0d0;
   }
-  .lr-hearts {
-    font-size: 16px;
-    letter-spacing: 4px;
+  .lr-heart-left,
+  .lr-heart-right {
+    font-size: 30px;
   }
   .lr-top-section img {
     max-width: 250px;
