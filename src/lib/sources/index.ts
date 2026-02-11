@@ -35,8 +35,17 @@ export async function fetchAllSources(): Promise<RawStory[]> {
     unique.push(story);
   }
 
+  // Filter to stories published within the last 36 hours
+  const freshnessCutoff = Date.now() - 36 * 60 * 60 * 1000;
+  const fresh = unique.filter((story) => {
+    if (!story.published_at) return false;
+    const pubTime = new Date(story.published_at).getTime();
+    if (isNaN(pubTime)) return false;
+    return pubTime >= freshnessCutoff;
+  });
+
   console.log(
-    `[Sources] Total: ${all.length}, After dedup: ${unique.length}`
+    `[Sources] Total: ${all.length}, After dedup: ${unique.length}, After freshness filter (36h): ${fresh.length}`
   );
-  return unique;
+  return fresh;
 }
