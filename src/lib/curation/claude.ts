@@ -1,5 +1,6 @@
 import Anthropic from "@anthropic-ai/sdk";
-import { RawStory, ClaudeBatchResult, ClaudeFinalResult, StoryCategory, StoryTier } from "../types";
+import { RawStory, ClaudeBatchResult, ClaudeFinalResult, StoryCategory, StoryTier, EthicalScores } from "../types";
+import { computeHighestGood, highestGoodToImportance } from "./scoring";
 
 const client = new Anthropic();
 
@@ -84,22 +85,39 @@ REJECT:
 - US-centric political partisan spin
 - Celebrity charity unless the systemic impact is massive
 
-IMPORTANCE SCORING (spread your scores — do NOT cluster everything at 7-8):
-10 = Historic, civilization-level (peace deal ending decades of war, disease eradicated)
-9 = Major global significance (landmark international court ruling, species declared recovered)
-8 = Significant (national policy shift, major scientific breakthrough)
-7 = Notable (regional victory, important legal precedent)
-5-6 = Solid positive development
-3-4 = Good but modest
-1-2 = Minor but real
+THE EIGHT DIMENSIONS OF GOOD — Score each story on all 8 dimensions using 0.0-10.0 floats with one decimal place. Use the full range.
 
-DIVERSITY GUIDANCE: Actively seek variety. No more than 3 stories on the same narrow topic (e.g. max 3 cancer stories). Favor global stories over US-only when quality is similar. But do NOT reject good stories just to fill a quota — if a batch is science-heavy, select the best science stories AND whatever else is good.
+1. COURAGE (Andreia) — "What did it cost?" Did someone risk something real — safety, reputation, freedom, livelihood? A whistleblower who loses everything scores high. Good policy passed by committee scores low.
+
+2. IMPACT (Maslaha) — "How much total good was created?" Magnitude x breadth x duration. A cure reaching a billion people matters more than one reaching a thousand.
+
+3. JUSTICE (Tzedek) — "Does this shift power toward the powerless?" Does this redistribute power, voice, or resources toward those systematically denied them? Does it repair historical wrongs?
+
+4. COMPASSION (Karuna) — "Was this rooted in genuine care for the suffering of others?" Is there warmth? Does it honor vulnerability, tend to wounds, cross divides? Impact counts bodies; Compassion counts tears.
+
+5. HARMONY (Wu Wei) — "Does this serve the web of life?" Does this demonstrate that human and ecological flourishing are inseparable? Does it think in generations? Does it recognize non-human beings as having intrinsic value?
+
+6. GRACE (Charis) — "Was good extended across a divide?" Did someone extend goodness to someone who didn't deserve it, didn't earn it, might even be their enemy? This is what separates compassion from radical compassion.
+
+7. TRUTH (Satya/Maat) — "Did this make hidden reality visible?" Truth-telling as a moral act — the deliberate choice to reveal what is real, even when concealment would be easier, safer, or more profitable.
+
+8. TRANSCENDENCE (Nishkama Karma) — "Does this exceed what self-interest can explain?" Does the goodness surpass what incentives, strategy, or obligation can explain? Purely, inexplicably generous?
+
+KEY TENSIONS — Contradictions between dimensions are signal, not noise:
+- Grace vs Justice: reconciliation vs accountability — both can be right
+- Truth vs Compassion: sometimes the truth hurts; both honesty and gentleness have moral weight
+- Courage vs Harmony: a whistleblower disrupts a stable system — courageous but disharmonious
+- Impact vs Transcendence: a billionaire's foundation saves millions, but was it selfless?
+
+SCORING GUIDANCE: Use 0.0-10.0 floats with one decimal. Use the full range — not everything is a 7. A 2.1 is fine. A 9.8 is fine. Contradictions between dimensions are expected and welcome.
+
+DIVERSITY GUIDANCE: Actively seek variety. No more than 3 stories on the same narrow topic. Favor global stories over US-only when quality is similar. But do NOT reject good stories just to fill a quota.
 
 For each selected story, return a JSON array of objects with keys:
 - index: The story number from the list (1-indexed)
-- importance: 1-10 score
 - category: one of: health | environment | science | justice | community | human-interest | innovation | culture | education | peace
 - summary: One sentence on why this matters (max 15 words)
+- scores: { courage: 0.0, impact: 0.0, justice: 0.0, compassion: 0.0, harmony: 0.0, grace: 0.0, truth: 0.0, transcendence: 0.0 }
 
 Select 15-25 stories per batch. Be generous — let good stories through. Return ONLY valid JSON.`;
 
@@ -171,13 +189,37 @@ async function runBatchCuration(
       message.content[0].type === "text" ? message.content[0].text : "";
 
     const jsonStr = extractJsonArray(text);
-    const results: ClaudeBatchResult[] = JSON.parse(jsonStr);
+    const rawResults: Array<{
+      index: number;
+      category: StoryCategory;
+      summary: string;
+      importance?: number;
+      scores?: EthicalScores;
+    }> = JSON.parse(jsonStr);
     const mapped: { story: RawStory; result: ClaudeBatchResult }[] = [];
 
-    for (const item of results) {
+    for (const item of rawResults) {
       const idx = item.index - 1;
       if (idx < 0 || idx >= stories.length) continue;
-      mapped.push({ story: stories[idx], result: item });
+
+      // Compute importance from scores if available, otherwise fall back
+      let importance = item.importance || 5;
+      let scores = item.scores;
+      if (scores) {
+        const hg = computeHighestGood(scores);
+        importance = highestGoodToImportance(hg);
+      }
+
+      mapped.push({
+        story: stories[idx],
+        result: {
+          index: item.index,
+          importance,
+          category: item.category,
+          summary: item.summary,
+          scores,
+        },
+      });
     }
 
     console.log(`[Claude] Batch ${batchIndex}: Selected ${mapped.length} stories`);
@@ -195,6 +237,8 @@ interface SurvivorStory {
   importance: number;
   category: StoryCategory;
   summary: string;
+  ai_scores?: EthicalScores;
+  highest_good?: number;
 }
 
 async function runFinalRanking(
@@ -203,7 +247,10 @@ async function runFinalRanking(
   if (!survivors.length) return [];
 
   const headlines = survivors
-    .map((s, i) => `${i + 1}. "${s.story.title}" [importance: ${s.importance}, category: ${s.category}]`)
+    .map((s, i) => {
+      const score = s.highest_good != null ? `highest_good: ${s.highest_good}` : `importance: ${s.importance}`;
+      return `${i + 1}. "${s.story.title}" [${score}, category: ${s.category}]`;
+    })
     .join("\n");
 
   try {
@@ -253,6 +300,8 @@ export interface MultiPassResult {
   tier: StoryTier;
   column?: "left" | "center" | "right";
   is_headline: boolean;
+  ai_scores?: EthicalScores;
+  highest_good?: number;
 }
 
 export interface CurationDiagnostics {
@@ -310,11 +359,14 @@ export async function curateWithClaude(
     const result = allBatchResults[i];
     if (result.status === "fulfilled") {
       for (const { story, result: r } of result.value) {
+        const hg = r.scores ? computeHighestGood(r.scores) : undefined;
         survivors.push({
           story,
           importance: r.importance,
           category: r.category as StoryCategory,
           summary: r.summary,
+          ai_scores: r.scores,
+          highest_good: hg,
         });
       }
       diag.batchSurvivorCounts.push(result.value.length);
@@ -330,8 +382,8 @@ export async function curateWithClaude(
 
   if (!survivors.length) return [];
 
-  // Sort by importance and cap at 80
-  survivors.sort((a, b) => b.importance - a.importance);
+  // Sort by highest_good (falling back to importance for unscored stories)
+  survivors.sort((a, b) => (b.highest_good ?? b.importance) - (a.highest_good ?? a.importance));
   const topSurvivors = survivors.slice(0, 80);
   diag.topSurvivorCount = topSurvivors.length;
 
@@ -375,6 +427,8 @@ export async function curateWithClaude(
       tier: f.tier as StoryTier,
       column: f.column as "left" | "center" | "right" | undefined,
       is_headline: f.tier === "banner",
+      ai_scores: survivor.ai_scores,
+      highest_good: survivor.highest_good,
     });
   }
 

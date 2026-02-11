@@ -1,10 +1,10 @@
 import { CuratedStory } from "@/lib/types";
 import { isBadImageUrl } from "@/lib/images";
+import ScoreBadge from "./ScoreBadge";
 
 export default function TopStories({ stories }: { stories: CuratedStory[] }) {
   if (!stories.length) return null;
 
-  // First story with a real image gets the image shown
   const imageStory = stories.find((s) => s.image_url && !isBadImageUrl(s.image_url));
 
   return (
@@ -15,17 +15,24 @@ export default function TopStories({ stories }: { stories: CuratedStory[] }) {
       )}
       {stories.map((story) => {
         const title = story.display_title || story.title.toUpperCase();
-        const isHighImportance = story.importance >= 9;
+        const score = story.highest_good ?? story.importance;
+        const isHighImportance = score >= 8.5;
         return (
-          <a
-            key={story.id}
-            href={story.url}
-            target="_blank"
-            rel="noopener noreferrer"
-            className={isHighImportance ? "red" : undefined}
-          >
-            {title}
-          </a>
+          <span key={story.id} style={{ display: "block" }}>
+            <a
+              href={story.url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className={isHighImportance ? "red" : undefined}
+            >
+              {title}
+            </a>
+            <ScoreBadge
+              scores={story.ai_scores}
+              highestGood={story.highest_good}
+              summary={story.summary}
+            />
+          </span>
         );
       })}
     </div>

@@ -114,7 +114,9 @@ export async function getActiveStories(): Promise<CuratedStory[]> {
     .sort((a, b) => {
       if (a.is_headline && !b.is_headline) return -1;
       if (!a.is_headline && b.is_headline) return 1;
-      return b.importance - a.importance;
+      const aScore = a.highest_good ?? a.importance;
+      const bScore = b.highest_good ?? b.importance;
+      return bScore - aScore;
     })
     .slice(0, 100);
 }
@@ -156,6 +158,8 @@ export async function upsertStories(
       curated_at: now,
       is_headline: story.is_headline,
       is_active: true,
+      ai_scores: story.ai_scores,
+      highest_good: story.highest_good,
     });
     inserted++;
   }

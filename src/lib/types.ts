@@ -1,3 +1,14 @@
+export interface EthicalScores {
+  courage: number;        // 0.0–10.0
+  impact: number;         // 0.0–10.0
+  justice: number;        // 0.0–10.0
+  compassion: number;     // 0.0–10.0
+  harmony: number;        // 0.0–10.0
+  grace: number;          // 0.0–10.0
+  truth: number;          // 0.0–10.0
+  transcendence: number;  // 0.0–10.0
+}
+
 export interface RawStory {
   title: string;
   url: string;
@@ -41,6 +52,8 @@ export interface CuratedStory {
   curated_at: string;
   is_headline: boolean;
   is_active: boolean;
+  ai_scores?: EthicalScores;
+  highest_good?: number;
 }
 
 export interface ClaudeBatchResult {
@@ -48,6 +61,7 @@ export interface ClaudeBatchResult {
   importance: number;
   category: StoryCategory;
   summary: string;
+  scores?: EthicalScores;
 }
 
 export interface ClaudeFinalResult {
@@ -57,14 +71,20 @@ export interface ClaudeFinalResult {
   column?: "left" | "center" | "right";
 }
 
+/** A cluster of stories sharing a dominant ethical dimension within a column */
+export interface StoryGroup {
+  dimensionKey?: string;
+  stories: CuratedStory[];
+}
+
 export interface DrudgeLayout {
   banner: CuratedStory | null;
   top: CuratedStory[];
   aboveFold: CuratedStory[];
   columns: {
-    left: CuratedStory[];
-    center: CuratedStory[];
-    right: CuratedStory[];
+    left: StoryGroup[];
+    center: StoryGroup[];
+    right: StoryGroup[];
   };
   bottomBar: CuratedStory[];
 }

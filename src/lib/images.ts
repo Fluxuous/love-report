@@ -126,7 +126,7 @@ export async function enrichWithOgImages(
   // Prioritize by importance so banner/top stories get images first
   const scrapeable = stories
     .filter((s) => !s.image_url && !s.url.includes("news.google.com"))
-    .sort((a, b) => b.importance - a.importance)
+    .sort((a, b) => (b.highest_good ?? b.importance) - (a.highest_good ?? a.importance))
     .slice(0, MAX_OG_SCRAPES);
 
   if (!scrapeable.length) {
