@@ -1,6 +1,50 @@
 import Parser from "rss-parser";
 import { RawStory } from "../types";
 
+/**
+ * Extract a publication date from a URL path.
+ * Many news sites embed dates: /2023/04/15/story, /2024-01-30-headline, /20230415/
+ * Returns ISO string or undefined.
+ */
+function extractDateFromUrl(url: string): string | undefined {
+  try {
+    const path = new URL(url).pathname;
+
+    // Match /YYYY/MM/DD/ or /YYYY-MM-DD- or /YYYY-MM-DD/
+    const slashDate = path.match(/\/(\d{4})\/(\d{2})\/(\d{2})\//);
+    if (slashDate) {
+      const [, y, m, d] = slashDate;
+      return validateAndBuild(y, m, d);
+    }
+
+    const dashDate = path.match(/\/(\d{4})-(\d{2})-(\d{2})[\/-]/);
+    if (dashDate) {
+      const [, y, m, d] = dashDate;
+      return validateAndBuild(y, m, d);
+    }
+
+    // Match /YYYYMMDD/ (compact format)
+    const compactDate = path.match(/\/(\d{4})(\d{2})(\d{2})\//);
+    if (compactDate) {
+      const [, y, m, d] = compactDate;
+      return validateAndBuild(y, m, d);
+    }
+  } catch {
+    // invalid URL — skip
+  }
+  return undefined;
+}
+
+function validateAndBuild(y: string, m: string, d: string): string | undefined {
+  const year = parseInt(y);
+  const month = parseInt(m);
+  const day = parseInt(d);
+  if (year < 2015 || year > 2030) return undefined;
+  if (month < 1 || month > 12) return undefined;
+  if (day < 1 || day > 31) return undefined;
+  return new Date(`${y}-${m}-${d}T00:00:00.000Z`).toISOString();
+}
+
 // Configure parser to extract image fields from RSS
 const parser = new Parser({
   timeout: 5000,
@@ -146,14 +190,27 @@ async function fetchFeed(
     const feed = await parser.parseURL(url);
     return (feed.items || [])
       .filter((item) => item.title && item.link)
-      .map((item) => ({
-        title: item.title!.trim(),
-        url: item.link!,
-        source: sourceName,
-        // Google News RSS always returns the Google News logo — never use it
-        image_url: sourceName.startsWith("Google News") ? undefined : extractImageUrl(item as never),
-        published_at: item.pubDate || item.isoDate || undefined,
-      }));
+      .map((item) => {
+        const rssPubDate = item.pubDate || item.isoDate || undefined;
+        const urlDate = extractDateFromUrl(item.link!);
+
+        // Use the OLDER of the two dates — URL dates can't be faked by RSS re-indexing
+        let published_at = rssPubDate;
+        if (urlDate && rssPubDate) {
+          published_at = urlDate < rssPubDate ? urlDate : rssPubDate;
+        } else if (urlDate) {
+          published_at = urlDate;
+        }
+
+        return {
+          title: item.title!.trim(),
+          url: item.link!,
+          source: sourceName,
+          // Google News RSS always returns the Google News logo — never use it
+          image_url: sourceName.startsWith("Google News") ? undefined : extractImageUrl(item as never),
+          published_at,
+        };
+      });
   } catch (err) {
     console.error(`[RSS] Error fetching ${sourceName} (${url}):`, err);
     return [];

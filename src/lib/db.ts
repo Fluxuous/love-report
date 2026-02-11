@@ -102,8 +102,10 @@ async function writeAll(stories: CuratedStory[]): Promise<void> {
 
 export async function getActiveStories(): Promise<CuratedStory[]> {
   const stories = await readAll();
+  // Display guard: never show stories older than 48h regardless of is_active
+  const displayCutoff = new Date(Date.now() - 48 * 60 * 60 * 1000).toISOString();
   return stories
-    .filter((s) => s.is_active)
+    .filter((s) => s.is_active && (!s.published_at || s.published_at >= displayCutoff))
     .map((s) => {
       // Strip known-bad images (Google logos etc.) from stored data
       if (s.image_url && isBadImageUrl(s.image_url)) {
@@ -174,9 +176,15 @@ export async function archiveOldStories(hoursOld: number = 48): Promise<number> 
   let archived = 0;
 
   for (const story of stories) {
-    if (story.is_active && story.curated_at < cutoff) {
-      story.is_active = false;
-      archived++;
+    if (story.is_active) {
+      if (story.published_at && story.published_at < cutoff) {
+        console.log(`[DB] Archiving by published_at: "${story.title}" (${story.published_at})`);
+        story.is_active = false;
+        archived++;
+      } else if (story.curated_at < cutoff) {
+        story.is_active = false;
+        archived++;
+      }
     }
   }
 

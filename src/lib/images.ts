@@ -32,16 +32,45 @@ export function isBadImageUrl(url: string | undefined): boolean {
   return isGenericImage(url);
 }
 
-async function fetchOgImage(url: string): Promise<string | undefined> {
+interface OgResult {
+  imageUrl?: string;
+  publishedDate?: string;
+}
+
+/**
+ * Extract article:published_time or JSON-LD datePublished from HTML head.
+ */
+function extractPublishedDate(html: string): string | undefined {
+  // <meta property="article:published_time" content="2023-04-15T..." />
+  const metaMatch = html.match(
+    /<meta[^>]+property=["']article:published_time["'][^>]+content=["']([^"']+)["']/i
+  ) || html.match(
+    /<meta[^>]+content=["']([^"']+)["'][^>]+property=["']article:published_time["']/i
+  );
+  if (metaMatch?.[1]) {
+    const d = new Date(metaMatch[1]);
+    if (!isNaN(d.getTime())) return d.toISOString();
+  }
+
+  // JSON-LD: "datePublished": "2023-04-15T..."
+  const jsonLdMatch = html.match(/"datePublished"\s*:\s*"([^"]+)"/);
+  if (jsonLdMatch?.[1]) {
+    const d = new Date(jsonLdMatch[1]);
+    if (!isNaN(d.getTime())) return d.toISOString();
+  }
+
+  return undefined;
+}
+
+async function fetchOgData(url: string): Promise<OgResult> {
   // Skip Google News URLs — can't reliably resolve to real article URLs
-  if (url.includes("news.google.com")) return undefined;
+  if (url.includes("news.google.com")) return {};
 
   try {
-    const scrapeUrl = url;
     const controller = new AbortController();
     const timeout = setTimeout(() => controller.abort(), OG_TIMEOUT);
 
-    const res = await fetch(scrapeUrl, {
+    const res = await fetch(url, {
       signal: controller.signal,
       headers: {
         "User-Agent": "LoveReport/2.0 (positive news aggregator)",
@@ -52,9 +81,9 @@ async function fetchOgImage(url: string): Promise<string | undefined> {
 
     clearTimeout(timeout);
 
-    if (!res.ok || !res.body) return undefined;
+    if (!res.ok || !res.body) return {};
 
-    // Read only the head portion to find og:image
+    // Read only the head portion
     const reader = res.body.getReader();
     const chunks: Uint8Array[] = [];
     let totalBytes = 0;
@@ -78,6 +107,7 @@ async function fetchOgImage(url: string): Promise<string | undefined> {
     );
 
     // Extract og:image
+    let imageUrl: string | undefined;
     const ogMatch = html.match(
       /<meta[^>]+property=["']og:image["'][^>]+content=["']([^"']+)["']/i
     ) || html.match(
@@ -85,22 +115,28 @@ async function fetchOgImage(url: string): Promise<string | undefined> {
     );
 
     if (ogMatch?.[1]) {
-      const imgUrl = ogMatch[1];
-      if (imgUrl.startsWith("http") && !isGenericImage(imgUrl)) return imgUrl;
+      const img = ogMatch[1];
+      if (img.startsWith("http") && !isGenericImage(img)) imageUrl = img;
     }
 
     // Fallback: twitter:image
-    const twMatch = html.match(
-      /<meta[^>]+name=["']twitter:image["'][^>]+content=["']([^"']+)["']/i
-    ) || html.match(
-      /<meta[^>]+content=["']([^"']+)["'][^>]+name=["']twitter:image["']/i
-    );
+    if (!imageUrl) {
+      const twMatch = html.match(
+        /<meta[^>]+name=["']twitter:image["'][^>]+content=["']([^"']+)["']/i
+      ) || html.match(
+        /<meta[^>]+content=["']([^"']+)["'][^>]+name=["']twitter:image["']/i
+      );
+      if (twMatch?.[1] && twMatch[1].startsWith("http") && !isGenericImage(twMatch[1])) {
+        imageUrl = twMatch[1];
+      }
+    }
 
-    if (twMatch?.[1] && twMatch[1].startsWith("http") && !isGenericImage(twMatch[1])) return twMatch[1];
+    // Extract published date from the same HTML buffer (free)
+    const publishedDate = extractPublishedDate(html);
 
-    return undefined;
+    return { imageUrl, publishedDate };
   } catch {
-    return undefined;
+    return {};
   }
 }
 
@@ -135,15 +171,30 @@ export async function enrichWithOgImages(
     return stories;
   }
 
-  console.log(`[OG] Scraping OG images for ${scrapeable.length} top stories...`);
+  console.log(`[OG] Scraping OG data for ${scrapeable.length} top stories...`);
+
+  const FRESHNESS_HOURS = 36;
+  const freshnessCutoff = new Date(Date.now() - FRESHNESS_HOURS * 60 * 60 * 1000).toISOString();
+  const staleUrls = new Set<string>();
 
   let enriched = 0;
   const results = await Promise.allSettled(
     scrapeable.map(async (story) => {
-      const imgUrl = await fetchOgImage(story.url);
-      if (imgUrl) {
-        story.image_url = imgUrl;
+      const ogData = await fetchOgData(story.url);
+      if (ogData.imageUrl) {
+        story.image_url = ogData.imageUrl;
         enriched++;
+      }
+      // If OG metadata reveals a stale article, flag it
+      if (ogData.publishedDate) {
+        // Use the older of existing published_at and OG date
+        if (!story.published_at || ogData.publishedDate < story.published_at) {
+          story.published_at = ogData.publishedDate;
+        }
+        if (story.published_at < freshnessCutoff) {
+          console.log(`[OG] STALE detected: "${story.title}" published ${story.published_at}`);
+          staleUrls.add(story.url);
+        }
       }
     })
   );
@@ -154,6 +205,8 @@ export async function enrichWithOgImages(
     }
   }
 
-  console.log(`[OG] Enriched ${enriched}/${scrapeable.length} stories with OG images`);
-  return stories;
+  console.log(`[OG] Enriched ${enriched}/${scrapeable.length} stories with OG images, ${staleUrls.size} stale filtered`);
+  return staleUrls.size > 0
+    ? stories.filter((s) => !staleUrls.has(s.url))
+    : stories;
 }
