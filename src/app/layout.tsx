@@ -3,11 +3,10 @@ import "./globals.css";
 
 export const metadata: Metadata = {
   title: "LOVE REPORT",
-  description:
-    "A Drudge Report-style news site that surfaces only the positive, uplifting news that matters today.",
+  description: "All the news that's fit to love.",
   openGraph: {
     title: "LOVE REPORT",
-    description: "Where's the Gold? Positive news that matters.",
+    description: "All the news that's fit to love.",
     type: "website",
   },
 };
