@@ -32,7 +32,7 @@ img {
 
 hr {
   border: none;
-  border-top: 1px solid #000000;
+  border-top: 2px solid #000000;
   margin: 8px 0;
 }
 
@@ -46,10 +46,14 @@ hr {
   margin-bottom: 6px;
 }
 
+.lr-top-section .story-row {
+  margin-bottom: 1px;
+}
+
 .lr-top-section a {
   display: inline;
   font-size: 14px;
-  line-height: 1.6;
+  line-height: 1.4;
   font-weight: bold;
 }
 
@@ -113,7 +117,7 @@ hr {
   display: flex;
   gap: 0;
   padding-top: 10px;
-  border-top: 1px solid #000000;
+  border-top: 2px solid #000000;
 }
 
 .lr-col {
@@ -126,11 +130,14 @@ hr {
   border-right: 1px solid #000000;
 }
 
+.lr-col .story-row {
+  padding: 3px 0;
+}
+
 .lr-col a {
   display: inline;
   font-size: 14px;
-  line-height: 1.5;
-  padding: 3px 0;
+  line-height: 1.6;
   font-weight: bold;
 }
 
@@ -157,7 +164,7 @@ hr {
   padding: 12px 0;
   font-size: 11px;
   color: #999999;
-  border-top: 1px solid #000000;
+  border-top: 2px solid #000000;
   margin-top: 10px;
 }
 
@@ -215,7 +222,7 @@ body.show-scores .score-inline {
   z-index: 100;
   left: 0;
   top: 1.4em;
-  width: 280px;
+  width: 320px;
   background: #ffffff;
   border: 1px solid #000000;
   padding: 8px 10px;
@@ -261,7 +268,7 @@ body.show-scores .story-row:hover .score-tooltip {
   display: flex;
   align-items: center;
   gap: 2px;
-  width: 95px;
+  width: 115px;
   flex-shrink: 0;
   text-decoration: none;
   color: #000000;

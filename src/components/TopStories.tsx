@@ -1,5 +1,6 @@
 import { CuratedStory } from "@/lib/types";
 import { isBadImageUrl } from "@/lib/images";
+import { toTitleCase } from "@/lib/format";
 import ScoreBadge from "./ScoreBadge";
 
 export default function TopStories({ stories }: { stories: CuratedStory[] }) {
@@ -14,7 +15,7 @@ export default function TopStories({ stories }: { stories: CuratedStory[] }) {
         <img src={imageStory.image_url} alt="" />
       )}
       {stories.map((story) => {
-        const title = story.display_title || story.title.toUpperCase();
+        const title = toTitleCase(story.display_title || story.title);
         const score = story.highest_good ?? story.importance;
         const isHighImportance = score >= 8.5;
         return (
