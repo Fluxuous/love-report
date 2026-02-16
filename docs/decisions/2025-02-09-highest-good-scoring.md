@@ -1,3 +1,31 @@
+# Highest Good — Ethical Scoring Framework
+
+**Date**: 2025-02-09
+**Status**: Complete
+**Relates to**: ROADMAP.md — v2.1
+
+---
+
+*Moved from `PLAN-highest-good-scoring.md` (root). Original content preserved below.*
+
+## Summary
+
+Defined an 8-dimension ethical scoring framework ("Highest Good") drawing from cross-cultural philosophical traditions. Each curated story is scored on Courage, Impact, Justice, Compassion, Harmony, Grace, Truth, and Transcendence (0.0–10.0 each), producing a weighted composite. Key insight: the tensions between dimensions (Grace vs Justice, Truth vs Compassion) are features, not bugs.
+
+## Decisions Made
+- 8 dimensions with Pitchfork-style float scores (0.0–10.0)
+- Weighted composite with editorial weights (not equal)
+- Scored during batch curation (not a separate pass) to stay within time budget
+- Hover tooltip with colored bar chart per dimension
+- Full About page explaining philosophical roots
+- Data model supports future human scoring (`ai_scores` / `human_scores`)
+
+## Full Design Document
+
+See below for the complete framework including philosophical roots, scoring methodology, and implementation plan.
+
+---
+
 # The Highest Good — Ethical Scoring Framework
 
 ## The Question
