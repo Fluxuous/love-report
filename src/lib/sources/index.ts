@@ -18,20 +18,33 @@ export async function fetchAllSources(): Promise<RawStory[]> {
     all.push(...rssStories.value);
   }
 
-  // Deduplicate by URL and by title (Google News produces same story from different queries)
+  // Deduplicate by URL and by title similarity
+  // (Google News produces near-duplicate stories from different queries)
   const seenUrls = new Set<string>();
-  const seenTitles = new Set<string>();
+  const seenTitles: string[] = [];
   const unique: RawStory[] = [];
 
   for (const story of all) {
     // Normalize URL: strip trailing slash, strip query params for dedup
     const normalizedUrl = story.url.split("?")[0].replace(/\/$/, "");
-    const normalizedTitle = story.title.toLowerCase().trim();
+    if (seenUrls.has(normalizedUrl)) continue;
 
-    if (seenUrls.has(normalizedUrl) || seenTitles.has(normalizedTitle)) continue;
+    // Fuzzy title dedup: extract significant words (4+ chars), check overlap
+    const normalizedTitle = story.title.toLowerCase().trim();
+    const titleWords = new Set(normalizedTitle.split(/\s+/).filter(w => w.length >= 4));
+    const isDuplicate = seenTitles.some(seen => {
+      const seenWords = new Set(seen.split(/\s+/).filter(w => w.length >= 4));
+      if (titleWords.size === 0 || seenWords.size === 0) return false;
+      let overlap = 0;
+      titleWords.forEach(w => { if (seenWords.has(w)) overlap++; });
+      const smaller = Math.min(titleWords.size, seenWords.size);
+      return smaller > 0 && overlap / smaller >= 0.6;
+    });
+
+    if (isDuplicate) continue;
 
     seenUrls.add(normalizedUrl);
-    seenTitles.add(normalizedTitle);
+    seenTitles.push(normalizedTitle);
     unique.push(story);
   }
 

@@ -351,8 +351,8 @@ export async function curateWithClaude(
     return [];
   }
 
-  // Pass 1: Split into 4 batches and curate in parallel
-  const batchSize = Math.ceil(stories.length / 4);
+  // Pass 1: Split into 3 batches and curate (2 parallel + 1)
+  const batchSize = Math.ceil(stories.length / 3);
   const batches: RawStory[][] = [];
   for (let i = 0; i < stories.length; i += batchSize) {
     batches.push(stories.slice(i, i + batchSize));
@@ -401,9 +401,31 @@ export async function curateWithClaude(
 
   if (!survivors.length) return [];
 
+  // Post-curation dedup: remove near-duplicate stories selected from different batches
+  // Uses fuzzy title matching on original titles (not display titles)
+  const dedupedSurvivors: SurvivorStory[] = [];
+  const survivorTitles: string[] = [];
+  for (const s of survivors) {
+    const lower = s.story.title.toLowerCase().trim();
+    const words = new Set(lower.split(/\s+/).filter(w => w.length >= 4));
+    const isDupe = survivorTitles.some(seen => {
+      const seenWords = new Set(seen.split(/\s+/).filter(w => w.length >= 4));
+      if (words.size === 0 || seenWords.size === 0) return false;
+      let overlap = 0;
+      words.forEach(w => { if (seenWords.has(w)) overlap++; });
+      const smaller = Math.min(words.size, seenWords.size);
+      return smaller > 0 && overlap / smaller >= 0.5;
+    });
+    if (!isDupe) {
+      dedupedSurvivors.push(s);
+      survivorTitles.push(lower);
+    }
+  }
+  console.log(`[Claude] Post-curation dedup: ${survivors.length} → ${dedupedSurvivors.length} unique stories`);
+
   // Sort by highest_good (falling back to importance for unscored stories)
-  survivors.sort((a, b) => (b.highest_good ?? b.importance) - (a.highest_good ?? a.importance));
-  const topSurvivors = survivors.slice(0, 80);
+  dedupedSurvivors.sort((a, b) => (b.highest_good ?? b.importance) - (a.highest_good ?? a.importance));
+  const topSurvivors = dedupedSurvivors.slice(0, 80);
   diag.topSurvivorCount = topSurvivors.length;
 
   // Pass 2: Final ranking and headline rewrite — split into 2 parallel calls to stay under token limits
@@ -431,9 +453,24 @@ export async function curateWithClaude(
     }
   }
 
-  // Build final output
+  // Build final output with display title dedup
+  // Claude rewrites headlines for the same event similarly, so catch dupes here
   const output: MultiPassResult[] = [];
+  const seenDisplayTitles: string[] = [];
   for (const { survivor, final: f } of finalResults) {
+    const lower = f.display_title.toLowerCase().trim();
+    const words = new Set(lower.split(/\s+/).filter(w => w.length >= 4));
+    const isDupe = seenDisplayTitles.some(seen => {
+      const seenWords = new Set(seen.split(/\s+/).filter(w => w.length >= 4));
+      if (words.size === 0 || seenWords.size === 0) return false;
+      let overlap = 0;
+      words.forEach(w => { if (seenWords.has(w)) overlap++; });
+      const smaller = Math.min(words.size, seenWords.size);
+      return smaller > 0 && overlap / smaller >= 0.5;
+    });
+    if (isDupe) continue;
+    seenDisplayTitles.push(lower);
+
     output.push({
       title: survivor.story.title,
       display_title: f.display_title,

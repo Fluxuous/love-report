@@ -104,7 +104,7 @@ export async function getActiveStories(): Promise<CuratedStory[]> {
   const stories = await readAll();
   // Display guard: never show stories older than 48h regardless of is_active
   const displayCutoff = new Date(Date.now() - 48 * 60 * 60 * 1000).toISOString();
-  return stories
+  const active = stories
     .filter((s) => s.is_active && (!s.published_at || s.published_at >= displayCutoff))
     .map((s) => {
       // Strip known-bad images (Google logos etc.) from stored data
@@ -119,8 +119,29 @@ export async function getActiveStories(): Promise<CuratedStory[]> {
       const aScore = a.highest_good ?? a.importance;
       const bScore = b.highest_good ?? b.importance;
       return bScore - aScore;
-    })
-    .slice(0, 100);
+    });
+
+  // Fuzzy dedup on display titles — catches same news event curated across runs
+  const deduped: CuratedStory[] = [];
+  const seenTitles: string[] = [];
+  for (const story of active) {
+    const lower = story.display_title.toLowerCase().trim();
+    const words = new Set(lower.split(/\s+/).filter(w => w.length >= 4));
+    const isDupe = seenTitles.some(seen => {
+      const seenWords = new Set(seen.split(/\s+/).filter(w => w.length >= 4));
+      if (words.size === 0 || seenWords.size === 0) return false;
+      let overlap = 0;
+      words.forEach(w => { if (seenWords.has(w)) overlap++; });
+      const smaller = Math.min(words.size, seenWords.size);
+      return smaller > 0 && overlap / smaller >= 0.5;
+    });
+    if (!isDupe) {
+      deduped.push(story);
+      seenTitles.push(lower);
+    }
+  }
+
+  return deduped.slice(0, 100);
 }
 
 export async function upsertStories(

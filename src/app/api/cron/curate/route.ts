@@ -29,8 +29,8 @@ export async function GET(request: NextRequest) {
     const rawStories = await fetchAllSources();
     log.push(`Fetched ${rawStories.length} raw stories`);
 
-    // Step 2: Keyword pre-filter to 200 candidates
-    const candidates = keywordPreFilter(rawStories, 200);
+    // Step 2: Keyword pre-filter to 150 candidates (reduced from 200 to fit time budget with descriptions)
+    const candidates = keywordPreFilter(rawStories, 150);
     log.push(`Keyword filter: ${candidates.length} candidates`);
 
     // Step 3: Multi-pass AI curation with Claude

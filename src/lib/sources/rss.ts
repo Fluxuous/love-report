@@ -97,65 +97,45 @@ const CURATED_FEEDS = [
 ];
 
 const GOOGLE_NEWS_QUERIES = [
-  // Science (keep lean — 3 queries, not 4)
+  // Science
   "scientific breakthrough discovery",
-  "medical breakthrough cure",
-  "renewable energy record milestone",
+  "medical breakthrough cure treatment",
 
-  // Nature healing & rewilding (global)
+  // Nature healing & rewilding
   "species recovery endangered saved",
   "rewilding restoration ecosystem recovery",
-  "ocean cleanup coral reef recovery",
-  "reforestation success trees planted",
+  "ocean coral reef recovery cleanup",
   "wildlife conservation victory",
 
-  // Human rights & resistance (global)
+  // Human rights & resistance
   "human rights victory court ruling",
   "political prisoner freed released",
-  "protest victory civil rights won",
   "indigenous land rights victory",
   "workers union victory strike won",
   "whistleblower vindicated wins",
-  "community defeats corporation pipeline",
-  "refugees welcomed sanctuary",
 
-  // Heroism & courage (everyday people, not military)
+  // Heroism & courage
   "heroic rescue saves lives",
-  "teenager saves drowning",
-  "bystander rescues stranger",
-  "teen hero rescue",
-  "man saves child from",
-  "woman rescues family from",
-  "neighbor saves house fire",
-  "good samaritan rescues",
-  "survived against odds miracle",
+  "teen hero rescue bystander",
+  "good samaritan rescues stranger",
 
-  // Peace & civilization healing (global)
+  // Peace & civilization
   "peace agreement ceasefire signed",
-  "reconciliation former enemies",
-  "restorative justice success",
-  "truth commission progress",
+  "restorative justice reconciliation",
   "reparations justice historic",
 
   // Living with nature
-  "regenerative agriculture harvest",
+  "regenerative agriculture permaculture",
   "indigenous ecological knowledge",
-  "community garden urban farm",
-  "permaculture food forest",
 
-  // Global development & dignity
-  "poverty reduction milestone",
+  // Global development
   "clean water village access",
   "education girls school access",
-  "humanitarian aid delivers",
-  "mutual aid community support",
-  "cooperative worker owned",
+  "cooperative worker owned mutual aid",
 
-  // Africa, Asia, Latin America, Pacific specific
+  // Region-specific
   "Africa breakthrough innovation",
-  "India community victory progress",
   "Latin America indigenous rights victory",
-  "Pacific islands climate resilience",
   "Southeast Asia conservation success",
 ];
 

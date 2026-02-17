@@ -40,25 +40,32 @@ Eight ethical dimensions scored by AI for every curated story. Score badge with 
 - Full About page with philosophical roots, tensions, methodology
 - Backward compatible with unscored stories
 
-## v2.2 — Story Quality Improvements [Current]
+## v2.2 — Story Quality Improvements [Built]
 
-Five low-effort, high-impact improvements to curation quality. All free.
+Five improvements to curation quality, plus pipeline optimization. All free.
 
 1. **Pass RSS descriptions to Claude** — scoring 8 dimensions from headlines alone is guessing; adding 1-2 sentence descriptions makes it judgment
 2. **Spike bonus in scoring** — `composite = weightedAvg * 0.7 + maxDimension * 0.3` so exceptional stories aren't buried by mediocre-but-broad ones
-3. **Fix negative keyword filter** — `arrest`, `charged`, `guilty`, `war` currently block justice/accountability stories (the #2 editorial priority)
-4. **Add 10-15 direct RSS feeds** — Global South (Al Jazeera, Rest of World, Global Voices), science (The Conversation, ScienceDaily), environment (Guardian, Grist), justice (The 19th)
-5. **Pass scores + summaries to final ranking** — give Pass 2 the context it needs for accurate tier placement
+3. **Fix negative keyword filter** — `arrest`, `charged`, `guilty`, `war` no longer hard-block justice/accountability stories
+4. **Add 11 direct RSS feeds** — Global South (Al Jazeera, Rest of World, Global Voices, The New Humanitarian), science (The Conversation, ScienceDaily), environment (Guardian, Grist, Canary Media), justice (The 19th), development (Devex)
+5. **Pass scores + summaries to final ranking** — score-to-tier guidance for accurate placement
+6. **Fuzzy title dedup** — catches near-duplicate stories from different Google News queries
+7. **Trim Google News queries** (47 → 27) — merged redundant queries to reclaim time budget
 
-## v2.3 — Daily Newsletter [Planned]
+## v2.3 — Daily Newsletter [Current]
 
-Automated daily digest via Buttondown ($9/mo). Pipeline generates content, pushes via API. Buttondown handles delivery, subscriber management, CAN-SPAM compliance.
+Automated daily digest via Resend (free tier, 100 emails/day). Subscribers stored in the Gist. Zero cost to start, upgrade path to Buttondown or Beehiiv when subscriber count justifies it.
 
-- Top 5 stories by Highest Good score with score badges
+- Top stories by Highest Good score with score badges
 - "Tension of the Day" — stories where ethical dimensions conflict (Grace vs Justice, etc.)
 - Subscribe/unsubscribe flow on Love Report site
 - Direct NGO ad placement slots (hand-curated, not programmatic)
-- Monetization path: free tier for everyone, future paid tier for premium content
+- External cron (cron-job.org, free) for daily send since Vercel Hobby only allows 1 cron
+- Monetization path: free tier → paid subscriptions → direct NGO ad placements
+
+## Infrastructure: Vercel Pro Upgrade [Planned — pending revenue]
+
+Upgrade to Vercel Pro ($20/mo) when revenue justifies it. Gives 300s maxDuration (vs 60s), multiple cron schedules, and headroom for pipeline enhancements. See `docs/decisions/2026-02-17-vercel-pro-upgrade.md`.
 
 ## v2.4 — Quality Testing & Polish [Planned]
 
