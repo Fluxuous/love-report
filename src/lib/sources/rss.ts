@@ -72,12 +72,25 @@ const CURATED_FEEDS = [
   { url: "https://www.nasa.gov/news-release/feed/", name: "NASA" },
   { url: "https://news.mongabay.com/feed/", name: "Mongabay" },
   { url: "https://www.rewild.org/feed", name: "Re:wild" },
+  { url: "https://theconversation.com/us/articles.atom", name: "The Conversation" },
+  { url: "https://www.sciencedaily.com/rss/all.xml", name: "ScienceDaily" },
   // Human rights & justice
   { url: "https://www.amnesty.org/en/latest/rss.xml", name: "Amnesty International" },
   { url: "https://www.hrw.org/rss/news_and_commentary", name: "Human Rights Watch" },
   { url: "https://www.eff.org/rss/updates.xml", name: "EFF" },
+  { url: "https://19thnews.org/feed/", name: "The 19th" },
+  // Environment
+  { url: "https://www.theguardian.com/environment/rss", name: "The Guardian Environment" },
+  { url: "https://grist.org/feed/", name: "Grist" },
+  { url: "https://www.canarymedia.com/feed", name: "Canary Media" },
   // Global development
   { url: "https://news.un.org/feed/subscribe/en/news/all/rss.xml", name: "UN News" },
+  { url: "https://www.devex.com/news/rss", name: "Devex" },
+  // Global South & non-Western sources
+  { url: "https://www.aljazeera.com/xml/rss/all.xml", name: "Al Jazeera" },
+  { url: "https://restofworld.org/feed/", name: "Rest of World" },
+  { url: "https://globalvoices.org/feed/", name: "Global Voices" },
+  { url: "https://www.thenewhumanitarian.org/rss.xml", name: "The New Humanitarian" },
   // Indigenous & land rights
   { url: "https://www.reddit.com/r/solarpunk/.rss", name: "r/solarpunk" },
   { url: "https://www.reddit.com/r/rewilding/.rss", name: "r/rewilding" },
@@ -202,6 +215,16 @@ async function fetchFeed(
           published_at = urlDate;
         }
 
+        // Extract description, strip HTML tags, truncate to ~300 chars
+        let description: string | undefined;
+        const rawDesc = item.contentSnippet || item.content || item.summary;
+        if (rawDesc) {
+          const cleaned = rawDesc.replace(/<[^>]+>/g, "").replace(/\s+/g, " ").trim();
+          if (cleaned.length > 10) {
+            description = cleaned.length > 300 ? cleaned.slice(0, 300) + "..." : cleaned;
+          }
+        }
+
         return {
           title: item.title!.trim(),
           url: item.link!,
@@ -209,6 +232,7 @@ async function fetchFeed(
           // Google News RSS always returns the Google News logo — never use it
           image_url: sourceName.startsWith("Google News") ? undefined : extractImageUrl(item as never),
           published_at,
+          description,
         };
       });
   } catch (err) {

@@ -15,6 +15,7 @@ export interface RawStory {
   source: string;
   image_url?: string;
   published_at?: string;
+  description?: string;
 }
 
 export type StoryCategory =

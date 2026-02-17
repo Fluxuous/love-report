@@ -93,11 +93,16 @@ export function computeHighestGood(
   scores: EthicalScores,
   weights: Record<DimensionKey, number> = DEFAULT_WEIGHTS
 ): number {
-  let sum = 0;
+  let weightedSum = 0;
+  let maxScore = 0;
   for (const dim of DIMENSION_META) {
-    sum += (scores[dim.key] || 0) * (weights[dim.key] || 0);
+    const val = scores[dim.key] || 0;
+    weightedSum += val * (weights[dim.key] || 0);
+    if (val > maxScore) maxScore = val;
   }
-  return Math.round(sum * 10) / 10;
+  // Spike bonus: exceptional single-dimension stories aren't buried by mediocre-but-broad ones
+  const composite = weightedSum * 0.7 + maxScore * 0.3;
+  return Math.round(composite * 10) / 10;
 }
 
 /** Map a 0-10 float composite to a 1-10 integer for backward compat with tier thresholds */

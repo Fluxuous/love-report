@@ -141,12 +141,14 @@ HEADLINE RULES:
   "Community raises $2M for school" → "SMALL TOWN RAISES $2M TO REBUILD LOCAL SCHOOL"
   "Chile cancels chemical plant near observatory" → "CHILE CANCELS CHEMICAL PLANT THAT THREATENED WORLD'S CLEAREST SKIES"
 
-TIER ASSIGNMENT:
-- banner (1 story): The single most important, dramatic story of the day
-- top (3-5 stories): Major stories that deserve prominent centered placement
-- above-fold (5-8 stories): Strong stories visible without scrolling
+TIER ASSIGNMENT — Use the highest_good score to guide placement:
+- banner (1 story): The single highest-scoring, most dramatic story. Should have highest_good >= 7.0.
+- top (3-5 stories): Major stories, generally highest_good >= 6.5
+- above-fold (5-8 stories): Strong stories, generally highest_good >= 5.5
 - column (bulk, 30-50 stories): The main body of content in 3 columns
-- bottom-bar (5-10 stories): Lighter/quirky stories for the bottom strip
+- bottom-bar (5-10 stories): Lower-scoring or lighter stories, generally highest_good < 5.0
+
+Scores are a strong signal but not a hard rule — editorial judgment still matters. A lower-scoring story with extraordinary narrative power can be promoted. But do NOT place a low-scoring story in banner/top without a compelling reason.
 
 COLUMN ASSIGNMENT (for "column" tier only):
 - left: science, health, innovation, education
@@ -174,7 +176,13 @@ async function runBatchCuration(
   if (!stories.length) return [];
 
   const headlines = stories
-    .map((s, i) => `${i + 1}. "${s.title}" — [${s.source}]`)
+    .map((s, i) => {
+      let line = `${i + 1}. "${s.title}" — [${s.source}]`;
+      if (s.description) {
+        line += `\n   → ${s.description}`;
+      }
+      return line;
+    })
     .join("\n");
 
   try {
@@ -255,7 +263,11 @@ async function runFinalRanking(
   const headlines = survivors
     .map((s, i) => {
       const score = s.highest_good != null ? `highest_good: ${s.highest_good}` : `importance: ${s.importance}`;
-      return `${i + 1}. "${s.story.title}" [${score}, category: ${s.category}]`;
+      let line = `${i + 1}. "${s.story.title}" [${score}, category: ${s.category}]`;
+      if (s.summary) {
+        line += `\n   → ${s.summary}`;
+      }
+      return line;
     })
     .join("\n");
 

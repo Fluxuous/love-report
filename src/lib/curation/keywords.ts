@@ -5,13 +5,10 @@ const POSITIVE_KEYWORDS = [
   "breakthrough",
   "saved",
   "victory",
-  "record",
   "milestone",
   "rescued",
-  "community",
   "innovation",
   "recovery",
-  "hope",
   "progress",
   "achieve",
   "discover",
@@ -25,19 +22,15 @@ const POSITIVE_KEYWORDS = [
   "solve",
   "restore",
   "protect",
-  "celebrate",
   "succeed",
-  "improve",
   "advance",
   "generous",
   "compassion",
-  "remarkable",
   // Nature & healing
   "rewild",
   "reforest",
   "regenerat",
   "ecosystem",
-  "species recover",
   "coral",
   "permaculture",
   "indigenous",
@@ -67,6 +60,12 @@ const POSITIVE_KEYWORDS = [
   "bravery",
   "life-saving",
   "lifesaving",
+  "defied",
+  "stood up",
+  "risked",
+  "despite threats",
+  "pulled from",
+  "rushed into",
   // Spirit & resilience
   "resilien",
   "solidarity",
@@ -74,9 +73,35 @@ const POSITIVE_KEYWORDS = [
   "empower",
   "dignity",
   "healing",
+  // Peace & civilization
+  "peace",
+  "treaty",
+  "ceasefire",
+  "amnesty",
+  "pardon",
+  "diplomatic",
+  "landmark ruling",
+  "historic vote",
+  "bipartisan",
+  "unanimous",
+  // Science & medicine
+  "vaccine",
+  "clinical trial",
+  "open source",
+  "treatment",
+  "therapy",
+  "diagnostic",
+  "gene therapy",
+  "fda approved",
+  // Innovation access
+  "patent-free",
+  "affordable",
+  "low-cost",
+  "accessible",
 ];
 
-const NEGATIVE_KEYWORDS = [
+// Hard negatives: always strongly negative signal
+const HARD_NEGATIVE_KEYWORDS = [
   "killed",
   "dead",
   "dies",
@@ -85,24 +110,29 @@ const NEGATIVE_KEYWORDS = [
   "crash",
   "disaster",
   "destroyed",
-  "attack",
   "shooting",
   "bomb",
   "explosion",
-  "war",
   "terror",
+  "catastrophe",
+  "famine",
+  "drought",
+  "recession",
+];
+
+// Soft negatives: ambiguous — could be accountability wins or peace stories
+// "CEO Arrested for Fraud" = accountability win, "War Ends" = peace story
+const SOFT_NEGATIVE_KEYWORDS = [
+  "attack",
+  "war",
   "scandal",
   "fraud",
   "arrest",
   "charged",
   "guilty",
   "victim",
-  "catastrophe",
   "collapse",
   "crisis",
-  "famine",
-  "drought",
-  "recession",
 ];
 
 /** Score a headline by positive/negative keyword presence */
@@ -114,8 +144,12 @@ function scoreHeadline(title: string): number {
     if (lower.includes(kw)) score += 1;
   }
 
-  for (const kw of NEGATIVE_KEYWORDS) {
+  for (const kw of HARD_NEGATIVE_KEYWORDS) {
     if (lower.includes(kw)) score -= 2;
+  }
+
+  for (const kw of SOFT_NEGATIVE_KEYWORDS) {
+    if (lower.includes(kw)) score -= 1;
   }
 
   return score;

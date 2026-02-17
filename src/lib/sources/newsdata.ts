@@ -23,6 +23,7 @@ interface NewsDataArticle {
   source_id: string;
   image_url?: string;
   pubDate?: string;
+  description?: string;
 }
 
 interface NewsDataResponse {
@@ -70,6 +71,7 @@ export async function fetchFromNewsData(): Promise<RawStory[]> {
               source: article.source_id || "newsdata",
               image_url: article.image_url || undefined,
               published_at: article.pubDate || undefined,
+              description: article.description || undefined,
             });
           }
         }

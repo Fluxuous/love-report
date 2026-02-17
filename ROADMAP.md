@@ -40,15 +40,33 @@ Eight ethical dimensions scored by AI for every curated story. Score badge with 
 - Full About page with philosophical roots, tensions, methodology
 - Backward compatible with unscored stories
 
-## v2.2 — Newsletter [Planned]
+## v2.2 — Story Quality Improvements [Current]
 
-Email digest with top-scored stories. Weekly or daily frequency option. Highlights the most interesting dimension tensions of the week — not just highest scores, but stories where Grace and Justice pulled in opposite directions, or where Courage and Harmony collided.
+Five low-effort, high-impact improvements to curation quality. All free.
 
-## v2.3 — Nonprofit Ad Network [Planned]
+1. **Pass RSS descriptions to Claude** — scoring 8 dimensions from headlines alone is guessing; adding 1-2 sentence descriptions makes it judgment
+2. **Spike bonus in scoring** — `composite = weightedAvg * 0.7 + maxDimension * 0.3` so exceptional stories aren't buried by mediocre-but-broad ones
+3. **Fix negative keyword filter** — `arrest`, `charged`, `guilty`, `war` currently block justice/accountability stories (the #2 editorial priority)
+4. **Add 10-15 direct RSS feeds** — Global South (Al Jazeera, Rest of World, Global Voices), science (The Conversation, ScienceDaily), environment (Guardian, Grist), justice (The 19th)
+5. **Pass scores + summaries to final ranking** — give Pass 2 the context it needs for accurate tier placement
 
-Hand-curated advertisements for genuine nonprofits only. No programmatic ads. No tracking pixels. No behavioral targeting. Strict editorial requirements: the nonprofit must demonstrate real impact, not just good marketing.
+## v2.3 — Daily Newsletter [Planned]
 
-Revenue sustains the project as a nonprofit entity with a modest founder salary. The ads themselves are curated with the same editorial philosophy as the stories.
+Automated daily digest via Buttondown ($9/mo). Pipeline generates content, pushes via API. Buttondown handles delivery, subscriber management, CAN-SPAM compliance.
+
+- Top 5 stories by Highest Good score with score badges
+- "Tension of the Day" — stories where ethical dimensions conflict (Grace vs Justice, etc.)
+- Subscribe/unsubscribe flow on Love Report site
+- Direct NGO ad placement slots (hand-curated, not programmatic)
+- Monetization path: free tier for everyone, future paid tier for premium content
+
+## v2.4 — Quality Testing & Polish [Planned]
+
+1-2 week bake period. Run the improved pipeline daily, manually review outputs, tune prompts and weights, fix newsletter formatting issues. Not a feature phase — a quality gate before going public.
+
+## v2.5 — Marketing & Promotion [Planned]
+
+Soft launch to personal network → social media → newsletter directories → cross-promotion with aligned newsletters → content marketing about the Highest Good framework.
 
 ## v3 — Human Scoring (Rotten Tomatoes Model) [Planned]
 
@@ -60,21 +78,12 @@ Readers vote on each dimension for each story, creating a collective moral judgm
 
 The site becomes not just a mirror but a participatory experiment in collective ethics.
 
-## v3.1 — Additional Metric Sets [Idea]
+## v3+ — Future Ideas
 
-- Deontological vs. utilitarian axis
-- Custom user weighting (adjust dimension weights to reflect your own values)
-- "Show me the most courageous stories" / "Show me the most just stories" filtering
-
-## v3.2 — User Accounts & Personalization [Idea]
-
-- Save preferred weights
-- Bookmark stories
-- Scoring history
-- Personal moral profile over time
-
-## Future Ideas
-
+- **Nonprofit Ad Network**: Hand-curated ads for genuine nonprofits only. Revenue sustains the project with editorial integrity.
+- **Custom Dimension Weighting**: Readers adjust weights to reflect their own values
+- **Dimension Filtering**: "Show me the most courageous stories" / "Show me the most just stories"
+- **User Accounts**: Save weights, bookmark stories, personal moral profile over time
 - **API**: Let other sites embed Highest Good scores
 - **Embeddable Score Widget**: A small badge any news site can add
 - **Highest Good Leaderboard**: Which sources consistently produce the highest-scored stories?
