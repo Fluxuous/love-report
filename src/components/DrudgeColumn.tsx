@@ -1,6 +1,5 @@
 import { StoryGroup } from "@/lib/types";
 import { isBadImageUrl } from "@/lib/images";
-import { toTitleCase } from "@/lib/format";
 import ScoreBadge from "./ScoreBadge";
 
 export default function DrudgeColumn({ groups }: { groups: StoryGroup[] }) {
@@ -23,7 +22,7 @@ export default function DrudgeColumn({ groups }: { groups: StoryGroup[] }) {
         <div key={group.dimensionKey || gi}>
           {gi > 0 && <hr />}
           {group.stories.map((story) => {
-            const title = toTitleCase(story.display_title || story.title);
+            const title = (story.display_title || story.title).toUpperCase();
             const score = story.highest_good ?? story.importance;
             const isHighImportance = score >= 8.5;
             const isItalic = score < 4.0;
