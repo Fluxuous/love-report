@@ -12,8 +12,8 @@ export function toTitleCase(str: string): string {
 
   return str.split(' ').map((word, i) => {
     if (/\d/.test(word)) return word;
-    // Preserve 2-3 letter acronyms (UN, US, EU, WHO, etc.)
-    if (/^[A-Z]{2,3}$/.test(word) && !SMALL_WORDS.has(word.toLowerCase())) return word;
+    // Preserve 2-letter acronyms (UN, US, EU, UK, etc.)
+    if (/^[A-Z]{2}$/.test(word) && !SMALL_WORDS.has(word.toLowerCase())) return word;
     const lower = word.toLowerCase();
     if (i === 0) return lower.charAt(0).toUpperCase() + lower.slice(1);
     if (SMALL_WORDS.has(lower)) return lower;
