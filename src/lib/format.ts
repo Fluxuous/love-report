@@ -4,13 +4,16 @@ const SMALL_WORDS = new Set([
   'by', 'of', 'up', 'as', 'is', 'if', 'it', 'no',
 ]);
 
-/** Convert ALL CAPS headline to Title Case. Preserves acronyms and numbers. */
+/** Normalize headlines to title case. Converts when >40% of alpha chars are uppercase. */
 export function toTitleCase(str: string): string {
-  if (str !== str.toUpperCase()) return str;
+  const alpha = str.replace(/[^a-zA-Z]/g, '');
+  const upper = alpha.replace(/[^A-Z]/g, '');
+  if (alpha.length > 0 && upper.length / alpha.length < 0.4) return str;
 
   return str.split(' ').map((word, i) => {
     if (/\d/.test(word)) return word;
-    if (/^[A-Z]{2,5}$/.test(word) && !SMALL_WORDS.has(word.toLowerCase())) return word;
+    // Preserve 2-3 letter acronyms (UN, US, EU, WHO, etc.)
+    if (/^[A-Z]{2,3}$/.test(word) && !SMALL_WORDS.has(word.toLowerCase())) return word;
     const lower = word.toLowerCase();
     if (i === 0) return lower.charAt(0).toUpperCase() + lower.slice(1);
     if (SMALL_WORDS.has(lower)) return lower;
