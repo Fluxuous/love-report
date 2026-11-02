@@ -3,6 +3,7 @@ import { Resend } from "resend";
 import { generateNewsletter } from "@/lib/newsletter";
 import { renderNewsletterHtml, renderNewsletterText } from "@/lib/newsletter-template";
 import { getSubscribers } from "@/lib/db";
+import { isAuthorized } from "@/lib/auth";
 
 export const maxDuration = 60;
 export const dynamic = "force-dynamic";
@@ -13,10 +14,9 @@ function getResend() {
 
 export async function POST(request: NextRequest) {
   // Auth: require CRON_SECRET or NEWSLETTER_SECRET
-  const authHeader = request.headers.get("authorization");
   const secret = process.env.NEWSLETTER_SECRET || process.env.CRON_SECRET;
 
-  if (secret && secret !== "local-dev-secret" && authHeader !== `Bearer ${secret}`) {
+  if (!isAuthorized(request.headers.get("authorization"), secret)) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 

@@ -4,19 +4,13 @@ import { keywordPreFilter } from "@/lib/curation/keywords";
 import { curateWithClaude, getLastDiagnostics, getBatchErrors } from "@/lib/curation/claude";
 import { enrichWithOgImages } from "@/lib/images";
 import { upsertStories, archiveOldStories, getStoryCount } from "@/lib/db";
+import { isAuthorized } from "@/lib/auth";
 
 export const maxDuration = 60;
 export const dynamic = "force-dynamic";
 
 export async function GET(request: NextRequest) {
-  const authHeader = request.headers.get("authorization");
-  const cronSecret = process.env.CRON_SECRET;
-
-  if (
-    cronSecret &&
-    cronSecret !== "local-dev-secret" &&
-    authHeader !== `Bearer ${cronSecret}`
-  ) {
+  if (!isAuthorized(request.headers.get("authorization"), process.env.CRON_SECRET)) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
