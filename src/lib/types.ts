@@ -72,6 +72,12 @@ export interface ClaudeFinalResult {
   column?: "left" | "center" | "right";
 }
 
+export interface Subscriber {
+  email: string;
+  subscribed_at: string;
+  confirmed: boolean;
+}
+
 /** A cluster of stories sharing a dominant ethical dimension within a column */
 export interface StoryGroup {
   dimensionKey?: string;

@@ -40,3 +40,6 @@ data/*.db-wal
 
 # claude
 .claude/
+
+# local runtime data (stories cache, subscribers, sqlite)
+/data/

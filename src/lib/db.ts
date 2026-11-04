@@ -1,4 +1,4 @@
-import { CuratedStory } from "./types";
+import { CuratedStory, Subscriber } from "./types";
 import { MultiPassResult } from "./curation/claude";
 import { isBadImageUrl } from "./images";
 import crypto from "crypto";
@@ -8,6 +8,7 @@ import path from "path";
 const IS_VERCEL = !!process.env.VERCEL;
 const GIST_ID = process.env.GIST_ID || "d520253be8b5d0a4260192b75217fec0";
 const GIST_FILENAME = "stories.json";
+const SUBSCRIBERS_FILENAME = "subscribers.json";
 const GITHUB_TOKEN = process.env.GITHUB_TOKEN;
 
 const DATA_DIR = path.join(process.cwd(), "data");
@@ -15,7 +16,7 @@ const JSON_PATH = path.join(DATA_DIR, "stories.json");
 
 // --- GitHub Gist storage (production) ---
 
-async function readGist(): Promise<CuratedStory[]> {
+async function readGistFile<T>(filename: string): Promise<T | null> {
   try {
     const res = await fetch(
       `https://api.github.com/gists/${GIST_ID}`,
@@ -27,18 +28,18 @@ async function readGist(): Promise<CuratedStory[]> {
         cache: "no-store",
       }
     );
-    if (!res.ok) return [];
+    if (!res.ok) return null;
     const gist = await res.json();
-    const content = gist.files?.[GIST_FILENAME]?.content;
-    if (!content) return [];
+    const content = gist.files?.[filename]?.content;
+    if (!content) return null;
     return JSON.parse(content);
   } catch (err) {
-    console.error("[DB] Failed to read gist:", err);
-    return [];
+    console.error(`[DB] Failed to read gist file ${filename}:`, err);
+    return null;
   }
 }
 
-async function writeGist(stories: CuratedStory[]): Promise<void> {
+async function writeGistFile(filename: string, data: unknown): Promise<void> {
   if (!GITHUB_TOKEN) {
     console.error("[DB] No GITHUB_TOKEN set, cannot write to gist");
     return;
@@ -52,49 +53,68 @@ async function writeGist(stories: CuratedStory[]): Promise<void> {
       },
       body: JSON.stringify({
         files: {
-          [GIST_FILENAME]: {
-            content: JSON.stringify(stories),
+          [filename]: {
+            content: JSON.stringify(data),
           },
         },
       }),
     });
     if (!res.ok) {
-      console.error("[DB] Failed to write gist:", res.status, await res.text());
+      console.error(`[DB] Failed to write gist file ${filename}:`, res.status, await res.text());
     }
   } catch (err) {
-    console.error("[DB] Failed to write gist:", err);
+    console.error(`[DB] Failed to write gist file ${filename}:`, err);
   }
 }
 
 // --- Local JSON file storage (dev) ---
 
-function readLocal(): CuratedStory[] {
+function readLocalFile<T>(filename: string): T | null {
   try {
-    if (!existsSync(JSON_PATH)) return [];
-    return JSON.parse(readFileSync(JSON_PATH, "utf-8"));
+    const filepath = path.join(DATA_DIR, filename);
+    if (!existsSync(filepath)) return null;
+    return JSON.parse(readFileSync(filepath, "utf-8"));
   } catch {
-    return [];
+    return null;
   }
 }
 
-function writeLocal(stories: CuratedStory[]): void {
+function writeLocalFile(filename: string, data: unknown): void {
   if (!existsSync(DATA_DIR)) {
     mkdirSync(DATA_DIR, { recursive: true });
   }
-  writeFileSync(JSON_PATH, JSON.stringify(stories, null, 2));
+  writeFileSync(path.join(DATA_DIR, filename), JSON.stringify(data, null, 2));
 }
 
 // --- Unified read/write ---
 
 async function readAll(): Promise<CuratedStory[]> {
-  return IS_VERCEL ? readGist() : readLocal();
+  if (IS_VERCEL) {
+    return (await readGistFile<CuratedStory[]>(GIST_FILENAME)) || [];
+  }
+  return readLocalFile<CuratedStory[]>(GIST_FILENAME) || [];
 }
 
 async function writeAll(stories: CuratedStory[]): Promise<void> {
   if (IS_VERCEL) {
-    await writeGist(stories);
+    await writeGistFile(GIST_FILENAME, stories);
   } else {
-    writeLocal(stories);
+    writeLocalFile(GIST_FILENAME, stories);
+  }
+}
+
+async function readSubscribers(): Promise<Subscriber[]> {
+  if (IS_VERCEL) {
+    return (await readGistFile<Subscriber[]>(SUBSCRIBERS_FILENAME)) || [];
+  }
+  return readLocalFile<Subscriber[]>(SUBSCRIBERS_FILENAME) || [];
+}
+
+async function writeSubscribers(subs: Subscriber[]): Promise<void> {
+  if (IS_VERCEL) {
+    await writeGistFile(SUBSCRIBERS_FILENAME, subs);
+  } else {
+    writeLocalFile(SUBSCRIBERS_FILENAME, subs);
   }
 }
 
@@ -219,4 +239,43 @@ export async function archiveOldStories(hoursOld: number = 48): Promise<number> 
 export async function getStoryCount(): Promise<number> {
   const stories = await getActiveStories();
   return stories.length;
+}
+
+// --- Subscriber API ---
+
+export async function addSubscriber(email: string): Promise<{ ok: boolean; message: string }> {
+  const normalized = email.toLowerCase().trim();
+  const subs = await readSubscribers();
+  const existing = subs.find((s) => s.email === normalized);
+  if (existing) {
+    return { ok: true, message: "Already subscribed" };
+  }
+  subs.push({
+    email: normalized,
+    subscribed_at: new Date().toISOString(),
+    confirmed: true, // Skip double opt-in for MVP (Resend handles bounce/complaint)
+  });
+  await writeSubscribers(subs);
+  return { ok: true, message: "Subscribed" };
+}
+
+export async function removeSubscriber(email: string): Promise<{ ok: boolean; message: string }> {
+  const normalized = email.toLowerCase().trim();
+  const subs = await readSubscribers();
+  const filtered = subs.filter((s) => s.email !== normalized);
+  if (filtered.length === subs.length) {
+    return { ok: false, message: "Not found" };
+  }
+  await writeSubscribers(filtered);
+  return { ok: true, message: "Unsubscribed" };
+}
+
+export async function getSubscribers(): Promise<Subscriber[]> {
+  const subs = await readSubscribers();
+  return subs.filter((s) => s.confirmed);
+}
+
+export async function getSubscriberCount(): Promise<number> {
+  const subs = await getSubscribers();
+  return subs.length;
 }

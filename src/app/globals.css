@@ -431,6 +431,74 @@ body.show-scores .story-row:hover .score-tooltip {
   max-width: 280px;
 }
 
+/* ============ SUBSCRIBE FORM ============ */
+.subscribe-box {
+  text-align: center;
+  padding: 12px 0 8px;
+}
+
+.subscribe-label {
+  font-family: "Times New Roman", Times, serif;
+  font-size: 11px;
+  font-weight: bold;
+  letter-spacing: 1px;
+  color: #666;
+  margin-bottom: 6px;
+}
+
+.subscribe-form {
+  display: inline-flex;
+  gap: 0;
+}
+
+.subscribe-input {
+  font-family: "Times New Roman", Times, serif;
+  font-size: 12px;
+  padding: 4px 8px;
+  border: 1px solid #000;
+  border-right: none;
+  outline: none;
+  width: 180px;
+  background: #fff;
+}
+
+.subscribe-input::placeholder {
+  color: #999;
+}
+
+.subscribe-btn {
+  font-family: "Times New Roman", Times, serif;
+  font-size: 11px;
+  font-weight: bold;
+  letter-spacing: 0.5px;
+  padding: 4px 12px;
+  border: 1px solid #000;
+  background: #000;
+  color: #fff;
+  cursor: pointer;
+}
+
+.subscribe-btn:hover {
+  background: #333;
+}
+
+.subscribe-btn:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+.subscribe-success {
+  font-size: 12px;
+  color: #27ae60;
+  font-weight: bold;
+}
+
+.subscribe-error {
+  font-size: 11px;
+  color: #c0392b;
+  margin-top: 4px;
+}
+
 /* ============ MOBILE ============ */
 @media (max-width: 640px) {
   .lr-columns {
