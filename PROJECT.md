@@ -2,8 +2,9 @@
 name: "Love Report"
 area: creative
 visibility: public
-stage: live
-rung: ""
+status: in-progress
+structure: none
+launched: ""
 tags: []
 now: ""
 linear: ""
