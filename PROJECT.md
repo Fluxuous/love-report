@@ -15,5 +15,3 @@ parent: ""
 # Love Report
 
 A positive news aggregator styled after the Drudge Report, with AI-curated stories.
-
-## Overrides
