@@ -2,12 +2,12 @@
 name: "Love Report"
 area: creative
 visibility: public
-status: in-progress
+status: ""
 structure: none
 launched: ""
 tags: []
 now: ""
-linear: ""
+linear: P-PAR-45
 repos: [labs/love-report]
 parent: ""
 ---
