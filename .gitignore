@@ -40,3 +40,12 @@ data/*.db-wal
 
 # claude
 .claude/
+
+# Code repos and child projects: each is its own repo.
+/.claude/
+/.git/
+/.vercel/
+/data/
+/docs/
+/node_modules/
+/src/

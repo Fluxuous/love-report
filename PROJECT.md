@@ -1,5 +1,6 @@
 ---
 name: "Love Report"
+kind: lab
 area: creative
 visibility: public
 status: ""
@@ -8,7 +9,7 @@ launched: ""
 tags: []
 now: ""
 linear: P-PAR-45
-repos: [labs/love-report]
+repos: []
 parent: ""
 ---
 
