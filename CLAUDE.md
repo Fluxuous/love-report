@@ -73,3 +73,9 @@ npm run dev
 Push to `main` → auto-deploys on Vercel.
 
 Gist ID: `d520253be8b5d0a4260192b75217fec0`
+
+## Working here
+
+- This folder is the project's workspace: the card is `PROJECT.md`, deliverables go in `<department>/` folders, and
+  every published Claude artifact gets a line in `artifacts.md` (handbook, `~/Manifesting/CLAUDE.md`).
+- Code repos inside this folder are their own repos. Keep plans and project state out of them.
